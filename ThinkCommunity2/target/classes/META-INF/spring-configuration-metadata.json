@@ -1,0 +1,71 @@
+{
+  "groups": [
+    {
+      "name": "fuce",
+      "type": "com.myIsoland.common.config.V2Config",
+      "sourceType": "com.myIsoland.common.config.V2Config"
+    },
+    {
+      "name": "spring.datasource.druid.db1",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.myIsoland.common.config.MyBatisPlusConfig",
+      "sourceMethod": "db1()"
+    },
+    {
+      "name": "spring.datasource.druid.db2",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.myIsoland.common.config.MyBatisPlusConfig",
+      "sourceMethod": "db2()"
+    },
+    {
+      "name": "spring.task.execution.pool",
+      "type": "com.myIsoland.thread.taskThreadProperty.TaskThreadPoolConfig",
+      "sourceType": "com.myIsoland.thread.taskThreadProperty.TaskThreadPoolConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "fuce.copyright-year",
+      "type": "java.lang.String",
+      "description": "版权年份",
+      "sourceType": "com.myIsoland.common.config.V2Config"
+    },
+    {
+      "name": "fuce.name",
+      "type": "java.lang.String",
+      "description": "项目名称",
+      "sourceType": "com.myIsoland.common.config.V2Config"
+    },
+    {
+      "name": "fuce.version",
+      "type": "java.lang.String",
+      "description": "版本",
+      "sourceType": "com.myIsoland.common.config.V2Config"
+    },
+    {
+      "name": "spring.task.execution.pool.core-pool-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.myIsoland.thread.taskThreadProperty.TaskThreadPoolConfig",
+      "defaultValue": 0
+    },
+    {
+      "name": "spring.task.execution.pool.keep-alive-seconds",
+      "type": "java.lang.Integer",
+      "sourceType": "com.myIsoland.thread.taskThreadProperty.TaskThreadPoolConfig",
+      "defaultValue": 0
+    },
+    {
+      "name": "spring.task.execution.pool.max-pool-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.myIsoland.thread.taskThreadProperty.TaskThreadPoolConfig",
+      "defaultValue": 0
+    },
+    {
+      "name": "spring.task.execution.pool.queue-capacity",
+      "type": "java.lang.Integer",
+      "sourceType": "com.myIsoland.thread.taskThreadProperty.TaskThreadPoolConfig",
+      "defaultValue": 0
+    }
+  ],
+  "hints": []
+}
