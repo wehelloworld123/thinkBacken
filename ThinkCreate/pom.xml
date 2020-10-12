@@ -86,8 +86,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-
-
+		<!--腾讯云-->
+		<dependency>
+			<groupId>com.tencentcloudapi</groupId>
+			<artifactId>tencentcloud-sdk-java</artifactId>
+			<version>3.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.66</version>
+		</dependency>
+		<!--单元测试-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -117,7 +127,7 @@
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus</artifactId>
-			<version>3.0.3</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -130,6 +140,7 @@
 			<!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
 		<!--</dependency>-->
 		<!--RabbitMQ-->
+		<!--GSON -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -139,13 +150,34 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
+			<version>2.8.5</version>
 		</dependency>
 
+		<!--生成验证码-->
+		<dependency>
+			<groupId>com.github.penggle</groupId>
+			<artifactId>kaptcha</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<!--elasticsearch-->
+
+<!--		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+		</dependency>
+	<!--	<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-elasticsearch</artifactId>
+		</dependency>-->
 		<!-- pageHelper -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper</artifactId>
-			<version>4.1.4</version>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>1.2.5</version>
 		</dependency>
 
 		<!--druid 数据源监控-->
@@ -155,6 +187,7 @@
 			<artifactId>druid-spring-boot-starter</artifactId>
 			<version>1.1.10</version>
 		</dependency>
+
 		<!-- shiro权限 -->
 		<dependency>
 			<groupId>org.apache.shiro</groupId>

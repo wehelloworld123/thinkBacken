@@ -806,22 +806,28 @@ CREATE TABLE `com_user_discuss` (
 DROP TABLE IF EXISTS `t_deb_topic`;
 CREATE TABLE `t_deb_topic` (
   `uid` varchar(30) COLLATE utf8_bin NOT NULL COMMENT '主键',
-  `title` varchar(100) CHARACTER SET utf8 DEFAULT NULL COMMENT '立题',
-  `content` varchar(300) CHARACTER SET utf8 DEFAULT NULL COMMENT '内容',
+  `subject` varchar(34) DEFAULT NULL COMMENT '专栏名',
+  `subject_id` varchar(34) DEFAULT NULL COMMENT '专栏id',
+  `title` varchar(100) DEFAULT NULL COMMENT '立题',
+  `content` varchar(300) DEFAULT NULL COMMENT '内容',
+  `label1` varchar(30)  DEFAULT NULL COMMENT '标签1',
+  `label2` varchar(30)  DEFAULT NULL COMMENT '标签2',
+  `label3` varchar(30)  DEFAULT NULL COMMENT '标签3',
   `thinking` int DEFAULT 0 COMMENT '思维度',
   `flexibility` int  DEFAULT 0 COMMENT '灵活性',
   `logicality` int  DEFAULT 0 COMMENT '逻辑性',
   `totalDiff` int  DEFAULT 0 COMMENT '总难度',
-  `keyWord` varchar(60)  DEFAULT NULL COMMENT '关键字',
+  `keyword` varchar(60)  DEFAULT NULL COMMENT '关键字',
   `views` int  DEFAULT 0 COMMENT '浏览量',
   `answers` int  DEFAULT 0 COMMENT '回答数',
-  `belong_nam` varchar(50)  DEFAULT null COMMENT '收录书架',
+  `belong_nm` varchar(50)  DEFAULT null COMMENT '收录书架',
   `belong_id` varchar(50)  DEFAULT null COMMENT '书架Id',
-  `min_lik` int  DEFAULT 0 COMMENT '最低喜欢数',
+  `min_like` int  DEFAULT 0 COMMENT '最低喜欢数',
   `min_recom` int  DEFAULT 0 COMMENT '最低推荐数',
   `finish` int  DEFAULT 0 COMMENT '已完成',
-  `times` int  DEFAULT 0 COMMENT '期数',
+  `period` int  DEFAULT 0 COMMENT '期数',
   `year` char(4)  DEFAULT '2000' COMMENT '年度',
+  `status` int  DEFAULT -1 COMMENT '状态',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
@@ -833,11 +839,13 @@ CREATE TABLE `t_deb_topic` (
 DROP TABLE IF EXISTS `t_deb_answer`;
 CREATE TABLE `t_deb_answer` (
   `no` varchar(40) NOT NULL COMMENT '主键',
-  `content` varchar(300) CHARACTER SET utf8 DEFAULT NULL COMMENT '评论',
+  `content` varchar(300) CHARACTER SET utf8 DEFAULT NULL COMMENT '立论',
+  `conclusion` varchar(300) CHARACTER SET utf8 DEFAULT NULL COMMENT '结论',
   `like` int DEFAULT 0 COMMENT '喜欢数',
   `recom_no` int  DEFAULT 0 COMMENT '推荐数',
   `topic_id` varchar(30)  DEFAULT null COMMENT '话题Id',
   `grade` int  DEFAULT 0 COMMENT '立论分值',
+  `favorer` text  DEFAULT 0 COMMENT '点赞',
   `creator` varchar(30)  DEFAULT NULL COMMENT '创建人',
   `creator_avat` varchar(30)  DEFAULT null COMMENT '创建人头像',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
@@ -852,8 +860,8 @@ DROP TABLE IF EXISTS `t_deb_recom`;
 CREATE TABLE `t_deb_recom` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键',
   `content` varchar(300) CHARACTER SET utf8 DEFAULT NULL COMMENT '评论',
-
-  `parent_id` varchar(40) DEFAULT -1 COMMENT '回答节点',
+  `likes` int CHARACTER SET utf8 DEFAULT NULL COMMENT '点赞',
+  `ans_id` varchar(40) DEFAULT -1 COMMENT '回答节点',
   `creator` varchar(30)  DEFAULT NULL COMMENT '创建人',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
@@ -862,6 +870,8 @@ CREATE TABLE `t_deb_recom` (
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='推荐表';
+
+
 
 
 DROP TABLE IF EXISTS `t_deb_user_topic`;

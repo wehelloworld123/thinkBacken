@@ -386,11 +386,19 @@ CREATE TABLE `t_com_activity` (
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3679 DEFAULT CHARSET=utf8 COMMENT='活动';
 
-DROP TABLE IF EXISTS `com_discuss`;
+DROP TABLE IF EXISTS `t_com_discuss`;
 CREATE TABLE `t_com_discuss` (
   `id` bigint  NOT NULL AUTO_INCREMENT COMMENT '主键自增列',
   `content` varchar(300) DEFAULT NULL COMMENT '帖子内容',
-  `pic` varchar(30) DEFAULT NULL COMMENT '帖子图片',
+  `pic1` varchar(300) DEFAULT NULL COMMENT '帖子图片1',
+  `pic2` varchar(300) DEFAULT NULL COMMENT '帖子图片2',
+  `pic3` varchar(300) DEFAULT NULL COMMENT '帖子图片3',
+  `pic4` varchar(300) DEFAULT NULL COMMENT '帖子图片4',
+  `pic5` varchar(300) DEFAULT NULL COMMENT '帖子图片5',
+  `pic6` varchar(300) DEFAULT NULL COMMENT '帖子图片6',
+  `pic7` varchar(300) DEFAULT NULL COMMENT '帖子图片7',
+  `pic8` varchar(300) DEFAULT NULL COMMENT '帖子图片8',
+  `pic9` varchar(300) DEFAULT NULL COMMENT '帖子图片9',
   `location` varchar(20) DEFAULT NULL COMMENT '帖子定位',
   `likes` int DEFAULT 0 COMMENT '点赞数',
   `concern_no` int DEFAULT 0 COMMENT '关注数',
@@ -398,6 +406,8 @@ CREATE TABLE `t_com_discuss` (
   `creator_sex` int DEFAULT 0 COMMENT '性别',
   `creator_avat` varchar(30) DEFAULT NULL  COMMENT '头像',
   `favorer` text DEFAULT NULL  COMMENT '点赞用户',
+  `comment_no` varchar(60) DEFAULT null COMMENT '评价数',
+  `label` int DEFAULT 0 COMMENT '评价数',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
@@ -410,7 +420,7 @@ CREATE TABLE `t_com_user_corp` (
   `id` int  NOT NULL AUTO_INCREMENT COMMENT '主键自增列',
   `uid` varchar(30) NOT NULL COMMENT '用户id',
   `cid` varchar(30) NOT NULL COMMENT '社团id',
-  `state` int DEFAULT 0 COMMENT '状态',
+  `status` int DEFAULT 0 COMMENT '状态',
     `create_by` varchar(35) DEFAULT NULL COMMENT '创建人',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
@@ -438,11 +448,13 @@ DROP TABLE IF EXISTS `t_com_comment`;
 CREATE TABLE `t_com_comment` (
   `id` bigint  NOT NULL AUTO_INCREMENT COMMENT '主键自增列',
   `content` varchar(300) DEFAULT NULL COMMENT '评论内容',
-  `root_d` varchar(35) NOT NULL COMMENT '根节点',
-  `parent_id` varchar(35) DEFAULT NULL COMMENT '父节点',
+  `root_id` bigint(35) NOT NULL COMMENT '根节点',
+  `parent_id` bigint(35) DEFAULT NULL COMMENT '父节点',
   `creator` varchar(30) DEFAULT NULL COMMENT '评论人',
   `creator_sex` int DEFAULT NULL COMMENT '性别',
   `creator_avat` varchar(30) DEFAULT NULL  COMMENT '头像',
+  `reply_id` varchar(34) DEFAULT NULL COMMENT '回复人id',
+  `reply_name` varchar(60) DEFAULT NULL COMMENT '回复人',
   `likes` int DEFAULT 0  COMMENT '喜欢',
   `favorer` text DEFAULT null  COMMENT '点赞renid',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人',
@@ -491,7 +503,7 @@ CREATE TABLE `t_percom_info` (
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
   `is_del` int DEFAULT 0 COMMENT '是否删除',
-  PRIMARY KEY (`uid`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户参与表';
 
 DROP TABLE IF EXISTS `t_com_user_activity`;

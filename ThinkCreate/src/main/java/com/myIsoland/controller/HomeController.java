@@ -26,7 +26,6 @@ public class HomeController {
     private static Logger logger= LoggerFactory.getLogger(HomeController.class);
     @PostMapping("login")
     public Object login(HttpServletRequest request,RedirectAttributes redirectAttributes) {
-
         String info = request.getParameter("TsysUser");
         TsysUser user = JSONObject.parseObject(info,TsysUser.class);
         String rememberMe = request.getParameter("remember");

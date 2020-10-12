@@ -1,16 +1,19 @@
 package com.myIsoland.controller.creation;
 
 
+import com.myIsoland.common.component.RedisCacheService;
 import com.myIsoland.common.domain.AjaxResult;
 import com.myIsoland.common.file.FileUploadUtils;
 import com.myIsoland.common.util.CaculateUtils;
 import com.myIsoland.common.util.DateUtils;
 import com.myIsoland.common.util.SnowflakeIdWorker;
 import com.myIsoland.constant.ProjectConstant;
+import com.myIsoland.constant.RedisConstant;
 import com.myIsoland.enitity.product.PaintContent;
 import com.myIsoland.enitity.product.Painting;
 import com.myIsoland.enitity.product.PaintingPart;
 import com.myIsoland.enums.CodeEnum;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.service.product.PaintContentService;
 import com.myIsoland.service.product.PaintingPartService;
 import com.myIsoland.service.product.PaintingService;
@@ -34,30 +37,61 @@ public class PaintCreationController {
     private PaintContentService paintContentService;
     @Autowired
     private PaintingPartService paintingPartService;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
     /**
      *@Author:THINKPAD
      *@Description:初始化艺术绘图创作信息
-     * @param paintId
+     * @param partId
      * @param date
      *@Return:java.lang.Object
      *@Data:16:43 2020/1/30
      **/
     @GetMapping("/readPaintingPro")
-    public Object ReadPaintingPro(Long paintId, String date){
+    public Object ReadPaintingPro(Long partId, String date,int startIndex,int pageSize){
         Map<String,Object> data = new HashMap<>();
-        String userId = ShiroUtils.getUserId();
-        PaintingPart part = paintingPartService.GetCharptDetail(paintId);
-        List<PaintContent> creations = paintContentService.GetHotContent(userId,paintId);
-        List<String> arr = new LinkedList<>();
-        for (PaintContent content : creations){
-            arr.add(ProjectConstant.CLITERPREFIX + content.getNo());
+       // String userId = ShiroUtils.getUserId();
+        PaintingPart part = paintingPartService.GetCharptDetail(partId);
+
+        if(part.getFinish()==1){
+            PaintContent content = paintContentService.GetAdoptContent(partId);
+            data.put("creation",CaculateUtils.deletePrefix(content));
         }
-        List<PaintContent> contents = paintContentService.GetContentsOrderByDate(userId,paintId, DateUtils.parseDate(date),arr);
-        data.put("charpt", CaculateUtils.deletePrefix(part));
-        data.put("creations",CaculateUtils.deletePaintsPrefix(creations));
-        data.put("contents",CaculateUtils.deletePaintsPrefix(contents));
+ /*       ResultSet<PaintContent> resultSet = paintContentService.GetContentsByLikes
+            (null,partId,startIndex,pageSize);
+        resultSet.setList(CaculateUtils.deletePaintsPrefix (resultSet.getList()));
+        List<PaintContent> creations = paintContentService.GetHotContent(partId,0,3);
+        data.put("result",CaculateUtils.deletePaintsPrefix(creations));*/
+
+     //   List<PaintContent> contents = paintContentService.GetContentsOrderByDate(userId,partId, DateUtils.parseDate(date),startIndex,pageSize,arr);
+        data.put("chapter", CaculateUtils.deletePrefix(part));
+     //   data.put("contents",CaculateUtils.deletePaintsPrefix(contents));
         return AjaxResult.success(data);
     }
+
+
+    /**
+     *@Author:THINKPAD
+     *@Description:初始化诗歌创作信息
+     * @param no
+     * @param isLogin
+     *@Return:java.lang.Object
+     *@Data:16:43 2020/1/30
+     **/
+    @GetMapping("/readPaintContentDetail")
+    public Object ReadPaintContentDetail(String no, Boolean isLogin){
+        no = ProjectConstant.CPAINTINGPREFIX + no;
+        String userId = null;
+        if(isLogin){
+            userId = ShiroUtils.getUserId();
+        }
+
+        PaintContent poemContent = paintContentService.GetPaintContentById(no,userId);
+
+        return AjaxResult.success(CaculateUtils.deletePrefix(poemContent));
+    }
+
 
     /**
      *@Author:THINKPAD
@@ -67,26 +101,58 @@ public class PaintCreationController {
      *@Data:13:42 2020/2/4
      **/
     @GetMapping("/modifyLikesSts")
-    public Object ModifyLikesSts(String no){
+    public Object ModifyLikesSts(String no,int type){
         String userId = ShiroUtils.getUserId();
-        no = ProjectConstant.CLITERPREFIX + no;
+        no = ProjectConstant.CPAINTINGPREFIX + no;
         paintContentService.UpdateLikeSts(userId,no);
+
+        if (type==1){
+            redisCacheService.setHashValue(RedisConstant.CPAINT+no,userId,"1");
+            System.out.println(redisCacheService.getHashMap(RedisConstant.CPOETRY+no));
+        }else if(type==0){
+            Boolean b = redisCacheService.hashFieldExist(RedisConstant.CPAINT+no,userId);
+            if(b){
+                if(redisCacheService.delHashField(RedisConstant.CPAINT+no,userId).equals(0)){
+                    return AjaxResult.error(CodeEnum.REDIS_EXCEPTION.getCode(),CodeEnum.REDIS_EXCEPTION.getMessage(),null);
+                }
+            }else {
+                paintContentService.DelLikeSts(userId,no);
+            }
+        }
         return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
     }
 
     /**
      *@Author:THINKPAD
      *@Description:根据日期获取接下来绘画作品
-     * @param charptId
+     * @param partId
      * @param date
      *@Return:java.lang.Object
      *@Data:17:19 2020/1/30
      **/
-    @GetMapping("/readNextLiteraturePro")
-    public Object ReadNextLiteraturePro(Long charptId,String date){
-        List<PaintContent> contents = paintContentService.GetContentsOrderByDate
-                (ShiroUtils.getUserId(),charptId,DateUtils.parseDate(date),new LinkedList<String>());
-        return AjaxResult.success(CaculateUtils.deletePaintsPrefix(contents));
+    @GetMapping("/readPaintProByDate")
+    public Object ReadPaintProByDate(Long partId,String date,int startIndex,int pageSize){
+        ResultSet<PaintContent> resultSet = paintContentService.GetContentsOrderByDate
+                (null,partId,DateUtils.parseDate(date),startIndex,pageSize,new LinkedList<String>());
+        resultSet.setList(CaculateUtils.deletePaintsPrefix (resultSet.getList()));
+        return AjaxResult.success(resultSet);
+
+    }
+
+    /**
+     *@Author:THINKPAD
+     *@Description:根据热度获取接下来绘画作品
+     * @param partId
+     * @param date
+     *@Return:java.lang.Object
+     *@Data:17:19 2020/1/30
+     **/
+    @GetMapping("/readRecomPaintPro")
+    public Object ReadRecomPaintPro(Long partId,int startIndex,int pageSize){
+        ResultSet<PaintContent> resultSet = paintContentService.GetContentsByLikes
+                (null,partId,startIndex,pageSize);
+        resultSet.setList(CaculateUtils.deletePaintsPrefix (resultSet.getList()));
+        return AjaxResult.success(resultSet);
 
     }
 

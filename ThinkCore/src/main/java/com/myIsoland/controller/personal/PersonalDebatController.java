@@ -32,19 +32,16 @@ public class PersonalDebatController {
      *@Data:22:28 2020/1/27
      **/
     @GetMapping("/readUserDebatInfo")
-    public Object ReadUserDebatInfo(String date){
+    public Object ReadUserDebatInfo(String date,int start,int limit){
         Map<String,Object> data = new HashMap<>();
-        try {
-            List<Map<String,Object>> rankAns = userTopicService.GetUserRankAns();
-            List<Topic> topics = userTopicService.GetUserAnsTopic(DateUtils.parseDate(date));
-            List<UserTopic> userTopics = userTopicService.GetUserRefBook();
-            data.put("rank",rankAns);
-            data.put("book",userTopics);
-            data.put("topic",topics);
-            return AjaxResult.success(data);
-        }catch (Exception e){
-           return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
+        List<Map<String,Object>> rankAns = userTopicService.GetUserRankAns();
+        List<Topic> topics = userTopicService.GetUserAnsTopic(DateUtils.parseDate(date),start,limit);
+        List<UserTopic> userTopics = userTopicService.GetUserRefBook(start,limit);
+        data.put("rankAns",rankAns);
+        data.put("bookList",userTopics);
+        data.put("topicList",topics);
+        return AjaxResult.success(data);
+
     }
 
     /**
@@ -55,11 +52,9 @@ public class PersonalDebatController {
      *@Data:23:06 2020/1/27
      **/
     @GetMapping("/readUserTopics")
-    public Object ReadUserTopics(String date){
-        try {
-            return AjaxResult.success(userTopicService.GetUserAnsTopic(DateUtils.parseDate(date)));
-        }catch (Exception e){
-            return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
+    public Object ReadUserTopics(String date,int start,int limit){
+
+            return AjaxResult.success(userTopicService.GetUserAnsTopic(DateUtils.parseDate(date),start,limit));
+
     }
 }

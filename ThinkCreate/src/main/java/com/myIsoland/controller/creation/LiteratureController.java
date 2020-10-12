@@ -53,22 +53,40 @@ public class LiteratureController {
      *@Return:java.lang.Object
      *@Data:19:47 2020/1/29
      **/
-    @GetMapping("/readLiteratures")
-    public Object ReadLiteratures(int type,int partner,int views){
+/*    @GetMapping("/readLiteratures")
+    public Object ReadLiteratures(int type,int partner,int views,int limit){
        Map<String,Object> map = new HashMap<>();
         List<Literature> literatures;
        if(partner>=999){
-           literatures = literatureService.GetInitLiterByType(CreateKind.valueOf(type),partner,views);
+           literatures = literatureService.GetInitLiterByType(CreateKind.valueOf(type),partner,views,limit);
        }else {
-           literatures = literatureService.GetLiteratureByType(CreateKind.valueOf(type),partner,views);
+           literatures = literatureService.GetLiteratureByType(CreateKind.valueOf(type),partner,views,limit);
        }
        List<Map<String,Object>> advanceLiters = literatureService.GetAdvanceLiterature();
        map.put("literatures", CaculateUtils.deleteLiteraturePrefix(literatures));
        map.put("advanceLiters",advanceLiters);
        return AjaxResult.success(map);
 
-    }
+    }*/
 
+    /**
+     *@Author:THINKPAD
+     *@Description:获取预推文学作品信息
+     * @param
+     * @param partner
+     * @param views
+     *@Return:java.lang.Object
+     *@Data:19:47 2020/1/29
+     **/
+    @GetMapping("/readAdvLiteratures")
+    public Object ReadAdvLiteratures(){
+        Map<String,Object> map = new HashMap<>();
+
+        List<Map<String,Object>> advanceLiters = literatureService.GetAdvanceLiterature();
+        map.put("advanceLiters",advanceLiters);
+        return AjaxResult.success(map);
+
+    }
 
     /**
      *@Author:THINKPAD
@@ -79,15 +97,34 @@ public class LiteratureController {
      *@Return:java.lang.Object
      *@Data:19:47 2020/1/29
      **/
-    @GetMapping("/readNextLiteratures")
-    public Object ReadNextLiteratures(int type,int partner,int views){
+    @GetMapping("/readLiteratures")
+    public Object ReadLiteratures(int type,int partner,int views,int limit){
         System.out.println("type:"+type);
         System.out.println("partner:"+partner);
         System.out.println("views:"+views);
         Map<String,Object> map = new HashMap<>();
-        List<Literature> literatures = literatureService.GetLiteratureByType(CreateKind.valueOf(type),partner,views);
+        List<Literature> literatures;
+        if(partner>=999){
+            literatures = literatureService.GetInitLiterByType(CreateKind.valueOf(type),partner,views,limit);
+        }else {
+            literatures = literatureService.GetLiteratureByType(CreateKind.valueOf(type),partner,views,limit);
+        }
         map.put("literatures",CaculateUtils.deleteLiteraturePrefix(literatures));
         return AjaxResult.success(map);
+    }
+
+    /**
+     *@Author:THINKPAD
+     *@Description:读取绘画作品详情
+     * @param uid
+     *@Return:java.lang.Object
+     *@Data:21:33 2020/1/29
+     **/
+    @GetMapping("/readLiterature")
+    public Object ReadLiterature(String uid){
+        uid = ProjectConstant.LITERPREFIX + uid;
+        Literature literature= literatureService.GetLiteratureById(uid);
+        return AjaxResult.success(literature);
     }
 
 
@@ -110,12 +147,12 @@ public class LiteratureController {
     public Object ReadLiteratureDetail(String id,int type){
         Map<String,Object> data = new HashMap<>();
         id = ProjectConstant.LITERPREFIX + id;
-        if(type==1||type==0) {
+        if(type==1||type==0) {//无数据
             Literature literature = literatureService.GetLiteratureById(id);
             data.put("literature",CaculateUtils.deletePrefix(literature));
         }
-        if(type==0||type==2) {
-            List<Map<String, Object>> partner = userCreationService.GetCreatPartInfo(id, RecomType.LITERATURE);
+        if(type==0||type==2) {//无创作人
+            List<Map<String, Object>> partner = userCreationService.GetCreatPartInfo(id, RecomType.LITERATURE,0,20);
             data.put("partner",partner);
         }
         redisCacheService.zsetByScore("liter_views",id,1);
@@ -137,14 +174,14 @@ public class LiteratureController {
         return AjaxResult.success(CaculateUtils.deleteChartpsPrefix(charpts));
     }
 
-    @PostMapping("/createUserLiter")
-    public Object CreateUserStoreLiter(String id,int type,int kind){
+    @PostMapping("/createUserStorePro")
+    public Object CreateUserStorePro(String id,int type,int kind){
         UserProduct data = new UserProduct();
         if(RecomType.LITERATURE.getValue()==type){
             id = ProjectConstant.CLITERPREFIX + id;
         }
         data.setCreationId(id);
-        data.setType(type);
+        data.setTyp(type);
         if(ProStatus.store.getValue()==kind){
             data.setKind(kind);
             data.setStatus(1);
@@ -152,5 +189,27 @@ public class LiteratureController {
         data.setUserId(ShiroUtils.getUserId());
         userProductService.saveOrUpdate(data);
         return  AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
+    }
+
+
+    /**
+     *@Author:THINKPAD
+     *@Description:搜索书籍或者章节信息
+     * @param keyword
+     * @param startIndex
+     * @param pageSize
+     * @param type
+     *@Return:java.lang.Object
+     *@Data:22:18 2020/1/29
+     **/
+    @GetMapping("/search")
+    public Object Search(String keyword,int startIndex,int pageSize,int type){
+        if(type==0) {
+            List<Literature> list = literatureService.QueryLiteratureByKey(keyword, startIndex, pageSize);
+            return AjaxResult.success(CaculateUtils.deleteLiteraturePrefix(list));
+        }else {
+            List<LiterCharpt> list = literCharpService.QueryLiterChaptByKey(keyword,startIndex,pageSize);
+            return AjaxResult.success(CaculateUtils.deleteChartpsPrefix(list));
+        }
     }
 }

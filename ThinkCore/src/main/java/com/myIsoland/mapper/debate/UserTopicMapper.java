@@ -28,7 +28,7 @@ public interface UserTopicMapper extends BaseMapper<UserTopic> {
             "AND ut.is_del = 0 " +
             "AND ut.topic_id = t.uid " +
             "ORDER BY ut.create_by DESC " +
-            "LIMIT 5")
+            "LIMIT #{startIndex},#{pageSize}")
     @Results({
             @Result(column = "uid",property = "uid"),
             @Result(column = "title",property = "title"),
@@ -36,6 +36,6 @@ public interface UserTopicMapper extends BaseMapper<UserTopic> {
             @Result(column = "times",property = "times"),
             @Result(column = "create_dat",property = "createDat")
     })
-    List<Topic> GetUserTopics(@Param("userId") String userId, @Param("date") Date date);
+    List<Topic> GetUserTopics(@Param("userId") String userId, @Param("date") Date date,@Param("startIndex")int startIndex,@Param("pageSize")int pageSize);
 
 }

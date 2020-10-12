@@ -5,12 +5,13 @@ import com.myIsoland.common.component.KickoutSessionControlFilter;
 import com.myIsoland.common.component.RedisObjectSerializer;
 import com.myIsoland.common.component.StringRedisSerializer;
 import com.myIsoland.common.exception.GlobalExceptionResolver;
-import com.myIsoland.shiro.service.DefaultHeaderSessionManager;
-import com.myIsoland.shiro.service.HeaderRememberMeManager;
-import com.myIsoland.shiro.service.MyShiroFilterFactoryBean;
-import com.myIsoland.shiro.service.MyShiroRealm;
+import com.myIsoland.shiro.service.*;
+import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
@@ -22,7 +23,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import javax.servlet.Filter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -47,6 +50,7 @@ public class ShiroConfig {
         MyShiroFilterFactoryBean shiroFilterFactoryBean = new MyShiroFilterFactoryBean();
 		//登录
 		shiroFilterFactoryBean.setLoginUrl("/login");
+
         Map<String, Filter> filtersMap = new LinkedHashMap<String, Filter>();
         //限制同一帐号同时在线的个数。
         filtersMap.put("kickout", kickoutSessionControlFilter());
@@ -88,18 +92,23 @@ public class ShiroConfig {
 
     /**
      * web应用管理配置
-     * @param shiroRealm
-     * @param cacheManager
-     * @param manager
-     * @return
+     * @return securityManager
      */
 	@Bean(name = "securityManager")
 	public DefaultWebSecurityManager securityManager() {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+
+/*		List<Realm> realms = new ArrayList<>();
+		realms.add(myShiroRealm);
+		realms.add(phoneRealm);
+		securityManager.setRealms(realms);*/
+
 		securityManager.setRealm(shiroRealm(hashedCredentialsMatcher()));
 		securityManager.setCacheManager(redisCacheManager());
 		securityManager.setRememberMeManager(rememberMeManager());//记住Cookie
 		securityManager.setSessionManager(sessionManager());
+		//认证器
+/*		securityManager.setAuthenticator(abstractAuthenticator);*/
 		return securityManager;
 	}
 //	/**
@@ -245,7 +254,7 @@ public class ShiroConfig {
 //	}
 	
 	/**
-	 * 配置realm，用于认证和授权
+	 * 配置realm，用于密码认证和授权
 	 * @param hashedCredentialsMatcher
 	 * @return AuthorizingRealm
 	 */
@@ -256,7 +265,33 @@ public class ShiroConfig {
 		shiroRealm.setCredentialsMatcher(hashedCredentialsMatcher);
 		return shiroRealm;
 	}
-	
+	/**
+	 * 配置realm，用于验证码认证和授权
+	 * @return AuthorizingRealm
+	 */
+/*	@Bean
+	public UserPhoneRealm phoneRealm(){
+		UserPhoneRealm phoneRealm = new UserPhoneRealm();
+		phoneRealm.setCacheManager(redisCacheManager());
+		return phoneRealm;
+	}*/
+	/**
+	 * 认证器
+	 */
+/*	@Bean
+	public AbstractAuthenticator abstractAuthenticator(MyShiroRealm myShiroRealm, UserPhoneRealm userPhoneRealm){
+		// 自定义模块化认证器，用于解决多realm抛出异常问题
+		ModularRealmAuthenticator authenticator = new CustModularRealmAuthenticator();
+		// 认证策略：AtLeastOneSuccessfulStrategy(默认)，AllSuccessfulStrategy，FirstSuccessfulStrategy
+		authenticator.setAuthenticationStrategy(new AtLeastOneSuccessfulStrategy());
+		// 加入realms
+		List<Realm> realms = new ArrayList<>();
+		realms.add(myShiroRealm);
+		realms.add(userPhoneRealm);
+		authenticator.setRealms(realms);
+		return authenticator;
+	}*/
+
 	/**
 	 * 启用shiro方言，这样能在页面上使用shiro标签
 	 * @return

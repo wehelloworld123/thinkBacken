@@ -2,17 +2,46 @@ package com.myIsoland.common.util;
 
 import com.myIsoland.constant.ProjectConstant;
 import com.myIsoland.enitity.product.*;
+import com.myIsoland.enums.RecomType;
 
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Random;
 
 public class CaculateUtils {
+
+    private static final String SYMBOLS = "0123456789"; // 数字
+
+    private static final Random RANDOM = new SecureRandom();
+
+    /**
+     * 获取长度为 6 的随机数字
+     *
+     * @return 随机数字
+     * @date 修改日志：由 space 创建于 2018-8-2 下午2:43:51
+     */
+    public static String getNonce_str(int length) {
+
+        // 如果需要4位，那 new char[4] 即可，其他位数同理可得
+        char[] nonceChars = new char[length];
+
+        for (int index = 0; index < nonceChars.length; ++index) {
+            nonceChars[index] = SYMBOLS.charAt(RANDOM.nextInt(SYMBOLS.length()));
+        }
+
+        return new String(nonceChars);
+
+    }
 
     public static String translateId(String prefix,String no){
         if(StringUtils.isEmpty(no)){
             return  null;
         }
-        int length = prefix.length();
-        return no.substring(length);
+        if(no.indexOf(prefix)!=-1) {
+            return no.substring(prefix.length());
+        }else {
+            return no;
+        }
     }
 
     public static String subStr(String content,int length){
@@ -31,13 +60,13 @@ public class CaculateUtils {
     public static LiterCharpt deletePrefix(LiterCharpt data){
         data.setBookId(CaculateUtils.translateId(ProjectConstant.LITERPREFIX,data.getBookId()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if(!data.getLiterContent().equals(null)){
+        if(data.getLiterContent()!=null){
             data.getLiterContent().setNo(CaculateUtils.translateId(ProjectConstant.CLITERPREFIX,
                     data.getLiterContent().getNo()));
             data.getLiterContent().setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,
                     data.getLiterContent().getCreateBy()));
         }
-        if (!data.getCharpts().equals(null)){
+        if (data.getCharpts()!=null){
             for(LiterCharpt item :data.getCharpts()){
                 data.setBookId(CaculateUtils.translateId(ProjectConstant.LITERPREFIX,data.getBookId()));
                 data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
@@ -98,7 +127,7 @@ public class CaculateUtils {
         for(Literature item :data){
             item.setUid(CaculateUtils.translateId(ProjectConstant.LITERPREFIX,item.getUid()));
             item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
-            if (!item.getCharpt().equals(null)){
+            if (item.getCharpt()!=null){
                 item.getCharpt().setBookId(CaculateUtils.translateId(ProjectConstant.LITERPREFIX,item.getCharpt().getBookId()));
             }
         }
@@ -116,7 +145,7 @@ public class CaculateUtils {
         data.setNo(CaculateUtils.translateId(ProjectConstant.CLITERPREFIX,data.getNo()));
         data.setBookId(CaculateUtils.translateId(ProjectConstant.LITERPREFIX,data.getBookId()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if(!data.getRecommends().isEmpty()){
+        if(data.getRecommends()!=null){
             for(Recommend item : data.getRecommends()){
                 item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
             }
@@ -135,7 +164,7 @@ public class CaculateUtils {
             literContent.setNo(CaculateUtils.translateId(ProjectConstant.CLITERPREFIX,literContent.getNo()));
             literContent.setBookId(CaculateUtils.translateId(ProjectConstant.LITERPREFIX, literContent.getBookId()));
             literContent.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, literContent.getCreateBy()));
-            if(!literContent.getRecommends().isEmpty()){
+            if(literContent.getRecommends()!=null){
                 for(Recommend item : literContent.getRecommends()){
                     item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
                 }
@@ -154,7 +183,7 @@ public class CaculateUtils {
 
         data.setUid(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,data.getUid()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if (!data.getPart().equals(null)){
+        if (data.getPart()!=null){
             data.getPart().setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,data.getPart().getPaintId()));
         }
         return data;
@@ -170,7 +199,7 @@ public class CaculateUtils {
         for(Painting item :data){
             item.setUid(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,item.getUid()));
             item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
-            if (!item.getPart().equals(null)){
+            if (item.getPart()!=null){
                 item.getPart().setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,item.getPart().getPaintId()));
             }
         }
@@ -188,13 +217,13 @@ public class CaculateUtils {
     public static PaintingPart deletePrefix(PaintingPart data){
         data.setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,data.getPaintId()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if(!data.getPaintContent().equals(null)){
+        if(data.getPaintContent()!=null){
             data.getPaintContent().setNo(CaculateUtils.translateId(ProjectConstant.CPAINTINGPREFIX,
                     data.getPaintContent().getNo()));
             data.getPaintContent().setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,
                     data.getPaintContent().getCreateBy()));
         }
-        if (!data.getParts().equals(null)){
+        if (data.getParts()!=null){
             for(PaintingPart item :data.getParts()){
                 data.setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,data.getPaintId()));
                 data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
@@ -213,13 +242,13 @@ public class CaculateUtils {
         for (PaintingPart part : data) {
             part.setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX, part.getPaintId()));
             part.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, part.getCreateBy()));
-            if(!part.getPaintContent().equals(null)){
+            if(part.getPaintContent()!=null){
                 part.getPaintContent().setNo(CaculateUtils.translateId(ProjectConstant.CPAINTINGPREFIX,
                         part.getPaintContent().getNo()));
                 part.getPaintContent().setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,
                         part.getPaintContent().getCreateBy()));
             }
-            if (!part.getParts().equals(null)) {
+            if (part.getParts()!=null) {
                 for (PaintingPart item : part.getParts()) {
                     item.setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX, item.getPaintId()));
                     item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, item.getCreateBy()));
@@ -239,7 +268,7 @@ public class CaculateUtils {
         data.setNo(CaculateUtils.translateId(ProjectConstant.CPAINTINGPREFIX,data.getNo()));
         data.setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX,data.getPaintId()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if(!data.getRecommends().isEmpty()){
+        if(data.getRecommends()!=null){
             for(Recommend item : data.getRecommends()){
                 item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
             }
@@ -258,7 +287,7 @@ public class CaculateUtils {
             paintContent.setNo(CaculateUtils.translateId(ProjectConstant.CPAINTINGPREFIX,paintContent.getNo()));
             paintContent.setPaintId(CaculateUtils.translateId(ProjectConstant.PAINTINGPREFIX, paintContent.getPaintId()));
             paintContent.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, paintContent.getCreateBy()));
-            if(!paintContent.getRecommends().isEmpty()){
+            if(paintContent.getRecommends()!=null){
                 for(Recommend item : paintContent.getRecommends()){
                     item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
                 }
@@ -278,13 +307,13 @@ public class CaculateUtils {
     public static PoemSet deletePrefix(PoemSet data){
         data.setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX,data.getPoetryId()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if(!data.getPoemContent().equals(null)){
+        if(data.getPoemContent()!=null){
             data.getPoemContent().setNo(CaculateUtils.translateId(ProjectConstant.CPOETRYPREFIX,
                     data.getPoemContent().getNo()));
             data.getPoemContent().setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,
                     data.getPoemContent().getCreateBy()));
         }
-        if (!data.getSets().equals(null)){
+        if (data.getSets()!=null){
             for(PoemSet item :data.getSets()){
                 data.setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX,data.getPoetryId()));
                 data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
@@ -303,13 +332,13 @@ public class CaculateUtils {
         for (PoemSet poemSet : data) {
             poemSet.setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX, poemSet.getPoetryId()));
             poemSet.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, poemSet.getCreateBy()));
-            if(!poemSet.getPoemContent().equals(null)){
+            if(poemSet.getPoemContent()!=null){
                 poemSet.getPoemContent().setNo(CaculateUtils.translateId(ProjectConstant.CPOETRYPREFIX,
                         poemSet.getPoemContent().getNo()));
                 poemSet.getPoemContent().setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,
                         poemSet.getPoemContent().getCreateBy()));
             }
-            if (!poemSet.getSets().equals(null)) {
+            if (poemSet.getSets()!=null) {
                 for (PoemSet item : poemSet.getSets()) {
                     item.setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX, item.getPoetryId()));
                     item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, item.getCreateBy()));
@@ -329,7 +358,7 @@ public class CaculateUtils {
 
         data.setUid(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX,data.getUid()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if (!data.getPoemSet().equals(null)){
+        if (data.getPoemSet()!=null){
             data.getPoemSet().setPoetryId(CaculateUtils.translateId(ProjectConstant.LITERPREFIX,data.getPoemSet().getPoetryId()));
         }
         return data;
@@ -345,7 +374,7 @@ public class CaculateUtils {
         for(Poetry item :data){
             item.setUid(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX,item.getUid()));
             item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
-            if (!item.getPoemSet().equals(null)){
+            if (item.getPoemSet()!=null){
                 item.getPoemSet().setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX,item.getPoemSet().getPoetryId()));
             }
         }
@@ -363,7 +392,7 @@ public class CaculateUtils {
         data.setNo(CaculateUtils.translateId(ProjectConstant.CPOETRYPREFIX,data.getNo()));
         data.setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX,data.getPoetryId()));
         data.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,data.getCreateBy()));
-        if(!data.getRecommends().isEmpty()){
+        if(data.getRecommends()!=null){
             for(Recommend item : data.getRecommends()){
                 item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
             }
@@ -382,7 +411,7 @@ public class CaculateUtils {
             literContent.setNo(CaculateUtils.translateId(ProjectConstant.CPOETRYPREFIX,literContent.getNo()));
             literContent.setPoetryId(CaculateUtils.translateId(ProjectConstant.POETRYPREFIX, literContent.getPoetryId()));
             literContent.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, literContent.getCreateBy()));
-            if(!literContent.getRecommends().isEmpty()){
+            if(literContent.getRecommends()!=null){
                 for(Recommend item : literContent.getRecommends()){
                     item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
                 }
@@ -391,4 +420,44 @@ public class CaculateUtils {
         return data;
     }
 
+    /**
+     *@Author:THINKPAD
+     *@Description:消除创作推荐列表前缀
+     * @param data
+     *@Return:com.myIsoland.enitity.product.Recommend
+     *@Data:23:05 2020/1/30
+     **/
+    public static List<Recommend> deleteRecomPrefix(List<Recommend> data) {
+        for (Recommend recom : data) {
+            if(RecomType.LITERATURE.equals(RecomType.valueOf(recom.getKind())))
+                recom.setContentId(CaculateUtils.translateId(ProjectConstant.CLITERPREFIX,recom.getContentId()));
+            else if(RecomType.PAINTING.equals(RecomType.valueOf(recom.getKind())))
+                recom.setContentId(CaculateUtils.translateId(ProjectConstant.CPAINTINGPREFIX,recom.getContentId()));
+            else if(RecomType.POEMTY.equals(RecomType.valueOf(recom.getKind())))
+                recom.setContentId(CaculateUtils.translateId(ProjectConstant.CPOETRYPREFIX,recom.getContentId()));
+            recom.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX, recom.getCreateBy()));
+            if(recom.getComments()!=null){
+                for(Comment item : recom.getComments()){
+                    item.setReplyId(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getReplyId()));
+                    item.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,item.getCreateBy()));
+                }
+            }
+        }
+        return data;
+    }
+
+    /**
+     *@Author:THINKPAD
+     *@Description:消除创作推荐列表前缀
+     * @param data
+     *@Return:com.myIsoland.enitity.product.Recommend
+     *@Data:23:05 2020/1/30
+     **/
+    public static List<Comment> deleteComPrefix(List<Comment> data) {
+        for (Comment comment : data) {
+                comment.setReplyId(CaculateUtils.translateId(ProjectConstant.USERPREFIX,comment.getReplyId()));
+                comment.setCreateBy(CaculateUtils.translateId(ProjectConstant.USERPREFIX,comment.getCreateBy()));
+        }
+        return data;
+    }
 }

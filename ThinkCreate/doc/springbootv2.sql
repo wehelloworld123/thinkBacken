@@ -362,29 +362,34 @@ DROP TABLE IF EXISTS `t_pro_liter`;
 CREATE TABLE `t_pro_liter` (
   `uid` varchar(34) NOT NULL COMMENT '主键',
   `name` varchar(50) DEFAULT NULL COMMENT '书名',
-  `cover` varchar(50) DEFAULT NULL COMMENT '封面',
+  `cover` varchar(150) DEFAULT NULL COMMENT '封面',
+  `qr_code` varchar(150) DEFAULT NULL COMMENT '二维码',
+  `exhibition` varchar(150) DEFAULT NULL COMMENT '展示图',
   `typ` varchar(100) DEFAULT NULL COMMENT '类型',
   `label` varchar(100) DEFAULT '0' COMMENT '标签',
   `introduce` varchar(100) DEFAULT null COMMENT '介绍',
   `describe` varchar(300) DEFAULT NULL COMMENT '描述',
+  `rate` float DEFAULT 0 COMMENT '评分',
   `kind` int DEFAULT -1 COMMENT '类别',
   `charpter` int DEFAULT 0 COMMENT '章节',
   `section` int DEFAULT 0 COMMENT '小节',
   `fin_charp` int DEFAULT 0 COMMENT '完成章节',
-  `fin_section` int DEFAULT 0 COMMENT '已完成小节',
-  `form` int DEFAULT -1 COMMENT '形式',
+  `fin_section` int DEFAULT 0 COMMENT '完成小节',
+  `form` int DEFAULT -1 COMMENT '创作形式',
   `copyright` int DEFAULT 0 COMMENT '版权',
   `reward` varchar(30) DEFAULT NULL COMMENT '版费',
-  `deadline` date DEFAULT NULL COMMENT '完成期限',
+  `deadline` date DEFAULT NULL COMMENT '期限',
   `publisher` varchar(50) DEFAULT NULL COMMENT '出版方',
   `is_top` int DEFAULT 0 COMMENT '置顶',
-  `partner` int DEFAULT 0 COMMENT '参与创作者',
+  `partner` int DEFAULT 0 COMMENT '创作者',
   `views` bigint DEFAULT 0 COMMENT '浏览量',
+  `is_top` int DEFAULT 0 COMMENT '置顶',
+  `source` varchar(3) DEFAULT NULL COMMENT '来源',
   `finish` int DEFAULT 0 COMMENT '完成',
-  `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
+  `create_by` varchar(35) DEFAULT NULL COMMENT '创建人',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
-  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `l_update_dat` datetime DEFAULT NULL COMMENT '更新时间',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文学创作信息表';
 
@@ -392,24 +397,27 @@ DROP TABLE IF EXISTS `t_pro_charpt`;
 CREATE TABLE `t_pro_charpt` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键',
   `title` varchar(50) DEFAULT NULL COMMENT '标题',
-  `introduce` varchar(300) DEFAULT NULL COMMENT '章节介绍',
+  `introduce` varchar(300) DEFAULT NULL COMMENT '介绍',
+  `pic` varchar(150) DEFAULT NULL COMMENT '图片',
   `requirement` varchar(300) DEFAULT NULL COMMENT '创作要求',
+  `chap_type` int DEFAULT 0 COMMENT '类型',
+  `label` varchar(50) DEFAULT NULL COMMENT '标签',
   `creators` int DEFAULT 0 COMMENT '创作人员数',
-  `root` int DEFAULT 0 COMMENT '是否章',
-  `root_id` bigint DEFAULT 0 COMMENT '章节id',
+  `root` int DEFAULT 0 COMMENT '章',
+  `root_id` bigint DEFAULT 0 COMMENT '主编号',
   `book_id` varchar(30) DEFAULT NULL COMMENT '书id',
-  `paint_id` bigint DEFAULT 0 COMMENT '绘画id',
-  `poem_id` bigint DEFAULT 0 COMMENT '诗歌id',
-   `root_ord` int DEFAULT 0 COMMENT '父类序号',
+  `paint_id` bigint DEFAULT 0 COMMENT '关联绘画编号',
+  `poem_id` bigint DEFAULT 0 COMMENT '关联诗歌编号',
+   `root_ord` int DEFAULT 0 COMMENT '主序号',
   `ord` int DEFAULT 0 COMMENT '序号',
   `is_lock` int DEFAULT 1 COMMENT '上锁',
-  `finish` int DEFAULT 0 COMMENT '已完成',
+  `finish` int DEFAULT 0 COMMENT '完成',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文学章节信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文学作品章节';
 
 
 DROP TABLE IF EXISTS `t_pro_content`;
@@ -417,33 +425,41 @@ CREATE TABLE `t_pro_content` (
   `no` varchar(34) NOT NULL COMMENT '主键',
   `title` varchar(200) DEFAULT NULL COMMENT '标题',
   `summary` varchar(200) DEFAULT NULL COMMENT '简述',
-  `content` varchar(200) DEFAULT NULL COMMENT '内容',
- // `detail` text DEFAULT NULL  COMMENT '内容详情',
-  `file` varchar(30) DEFAULT NULL COMMENT '附件路径',
-  `charp_id` int DEFAULT 0 COMMENT '章节Id',
-  `book_id` VARCHAR(30) DEFAULT NULL COMMENT '书籍Id',
-  `charp_name` VARCHAR(30) DEFAULT NULL COMMENT '章节名称',
+  `content` text DEFAULT NULL COMMENT '内容',
+ `pic` varchar(200) DEFAULT NULL  COMMENT '图片',
+ // `file` varchar(30) DEFAULT NULL COMMENT '附件路径',
+  `charp_id` int DEFAULT 0 COMMENT '章节编号',
+   `charp_name` VARCHAR(30) DEFAULT NULL COMMENT '章节名称',
   `sec_name` VARCHAR(30) DEFAULT NULL COMMENT '小节名称',
-  `likes` int DEFAULT 0 COMMENT '喜欢数',
-  `recom_no` int DEFAULT 0 COMMENT '推荐数',
+  `book_id` VARCHAR(30) DEFAULT NULL COMMENT '书籍编号',
+  `book_name` VARCHAR(30) DEFAULT NULL COMMENT '书籍名称',
+  `likes` int DEFAULT 0 COMMENT '点赞',
+  `recom_no` int DEFAULT 0 COMMENT '推荐',
   `views` int DEFAULT 0 COMMENT '展示',
   `adopt` int DEFAULT 0 COMMENT '采纳',
-  `favorer` text DEFAULT NULL COMMENT '点赞用户字串',
+  `favorer` text DEFAULT NULL COMMENT '点赞人',
+   `creator` varchar(60) DEFAULT NULL COMMENT '创建人',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
-  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文学创作表';
+  `l_update_dat` datetime DEFAULT NULL COMMENT '更新时间',
+  `is_del` int DEFAULT 0 COMMENT '删除',
+  PRIMARY KEY (`no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文学创作内容';
 
 DROP TABLE IF EXISTS `t_pro_recom`;
 CREATE TABLE `t_pro_recom` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键',
   `content` varchar(200) DEFAULT NULL COMMENT '内容',
   `content_id` varchar(35) DEFAULT 0 COMMENT '章节Id',
+  `title` varchar(35) DEFAULT NULL COMMENT '标题',
+  `summary` varchar(100) DEFAULT NULL COMMENT '摘要',
   `typ` int DEFAULT -1 COMMENT '推荐类型',
   `likes` int DEFAULT 0 COMMENT '喜欢数',
   `favorer` text DEFAULT NULL COMMENT '点赞用户字串',
+  `creator` varchar(35) DEFAULT NULL COMMENT '评价人',
+  `create_avat` varchar(100) DEFAULT NULL COMMENT '评价人头像',
+  `create_sex` INT DEFAULT 0 COMMENT '性别',
+  `adopt` INT DEFAULT 0 COMMENT '采纳',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
@@ -455,39 +471,48 @@ CREATE TABLE `t_pro_recom` (
 DROP TABLE IF EXISTS `t_pro_paint`;
 CREATE TABLE `t_pro_paint` (
   `uid` varchar(30) NOT NULL COMMENT '主键',
-  `seter` varchar(10) DEFAULT NULL COMMENT '集',
+  `seter` varchar(10) DEFAULT NULL COMMENT '集名',
   `name` varchar(30) DEFAULT NULL COMMENT '名称',
+  `qr_code` varchar(150) DEFAULT NULL COMMENT '二维码',
+  `exhibition` varchar(150) DEFAULT NULL COMMENT '展示图',
   `cover` varchar(30) DEFAULT NULL COMMENT '封面',
   `topic` varchar(30) DEFAULT NULL COMMENT '主旨',
   `purpose` varchar(30) DEFAULT NULL COMMENT '用途',
-  `describe` varchar(100) DEFAULT NULL COMMENT '描述',
-  `kind` int DEFAULT -1 COMMENT '类别',
-  `parts` int DEFAULT -1 COMMENT '部分',
-  `section` int DEFAULT 0 COMMENT '小节',
-  `fin_part` int DEFAULT 0 COMMENT '完成部分',
-  `fin_section` int DEFAULT 0 COMMENT '完成小节',
+  `description` varchar(100) DEFAULT NULL COMMENT '描述',
+  `rate` float DEFAULT 0 COMMENT '评分',
+  `kind` varchar(3) DEFAULT -1 COMMENT '类别',
+  `parts` int DEFAULT -1 COMMENT '分集',
+  `section` int DEFAULT 0 COMMENT '画作',
+  `fin_part` int DEFAULT 0 COMMENT '完成分集',
+  `fin_section` int DEFAULT 0 COMMENT '完成画作',
   `form` varchar(20) DEFAULT NULL COMMENT '形式',
-  `partner` bigint DEFAULT 0 COMMENT '参与创作者',
+  `partner` bigint DEFAULT 0 COMMENT '创作者',
   `views` bigint DEFAULT 0 COMMENT '浏览量',
   `copyright` int DEFAULT 0 COMMENT '版权',
-  `reward` varchar(30) DEFAULT NULL COMMENT '奖池',
-  `deadline` date DEFAULT NULL COMMENT '截至日期',
+  `reward` varchar(30) DEFAULT NULL COMMENT '版费',
+  `deadline` date DEFAULT NULL COMMENT '期限',
   `publisher` varchar(20) DEFAULT NULL COMMENT '出品方',
   `is_top` int DEFAULT 0 COMMENT '置顶',
+  `source` varchar(3) DEFAULT NULL COMMENT '来源',
   `finish` int DEFAULT 0 COMMENT '完成',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='绘画创作表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='绘画创作集';
 
 DROP TABLE IF EXISTS `t_pro_paint_content`;
 CREATE TABLE `t_pro_paint_content` (
   `no` varchar(34) NOT NULL COMMENT '主键',
   `title` varchar(20) DEFAULT NULL COMMENT '标题',
-  `image` varchar(100) DEFAULT NULL COMMENT '图片url',
-  `cover` varchar(30) DEFAULT NULL COMMENT '封面',
+  `content` varchar(300) DEFAULT NULL COMMENT '内容',
+  `image` varchar(300) DEFAULT NULL COMMENT '图片url',
+  `pic1` varchar(300) DEFAULT NULL COMMENT '作品链接1',
+  `pic2` varchar(300) DEFAULT NULL COMMENT '作品链接2',
+  `pic3` varchar(300) DEFAULT NULL COMMENT '作品链接3',
+  `pic4` varchar(300) DEFAULT NULL COMMENT '作品链接4',
+  //`cover` varchar(30) DEFAULT NULL COMMENT '封面',
   `part_id` int DEFAULT 0 COMMENT '局部id',
   `paint_id` varchar(30) DEFAULT NULL COMMENT '画作id',
   `paint_name` varchar(30) DEFAULT NULL COMMENT '画集名称',
@@ -495,14 +520,16 @@ CREATE TABLE `t_pro_paint_content` (
   `sec_name` varchar(30) DEFAULT NULL COMMENT '小节名称',
   `likes` int DEFAULT 0 COMMENT '喜欢数',
   `recom_no` int DEFAULT 0 COMMENT '推荐数',
+  `views` int DEFAULT 0 COMMENT '展示',
   `adopt` int DEFAULT 0 COMMENT '采纳',
   `favorer` text DEFAULT NULL COMMENT '点赞用户字串',
   `dat` date DEFAULT NULL COMMENT '日期',
+  `creator` varchar(60) DEFAULT NULL COMMENT '创建人',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
   `is_del` int DEFAULT 0 COMMENT '是否删除',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='绘画创作内容表';
 
 
@@ -511,99 +538,109 @@ CREATE TABLE `t_pro_paint_part` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `subject` varchar(20) DEFAULT NULL COMMENT '主题',
   `introduce` varchar(300) DEFAULT NULL COMMENT '章节介绍',
+  `pic` varchar(150) DEFAULT NULL COMMENT '图片',
   `requirement` varchar(300) DEFAULT NULL COMMENT '创作要求',
-  `creators` int DEFAULT 0 COMMENT '创作人员数',
-  `root` int DEFAULT 0 COMMENT '根',
-  `root_id` bigint DEFAULT 0 COMMENT '分作id',
-  `liter_id` bigint DEFAULT 0 COMMENT '文章id',
-  `poem_id` bigint DEFAULT 0 COMMENT '诗歌id',
+  `part_type` varchar(3) DEFAULT NULL COMMENT '类型',
+  `creators` int DEFAULT 0 COMMENT '创作者',
+  `root` int DEFAULT 0 COMMENT '父节点',
+  `root_id` bigint DEFAULT 0 COMMENT '分集编号',
+  `liter_id` bigint DEFAULT 0 COMMENT '关联文章编号',
+  `poem_id` bigint DEFAULT 0 COMMENT '关联诗歌编号',
   `number` int DEFAULT 0 COMMENT '数量',
-  `root_ord` int DEFAULT 0 COMMENT '父类序号',
+  `root_ord` int DEFAULT 0 COMMENT '主序号',
   `ord` int DEFAULT 0 COMMENT '序号',
-  `paint_id` varchar(30) DEFAULT NULL COMMENT '画作id',
+  `paint_id` varchar(30) DEFAULT NULL COMMENT '画集编号',
+  `is_lock` int DEFAULT 1 COMMENT '锁',
   `finish` int DEFAULT 0 COMMENT '完成',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='绘画创作部分表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='绘画作品分集';
 
 DROP TABLE IF EXISTS `t_pro_poetry`;
 CREATE TABLE `t_pro_poetry` (
   `uid` varchar(35) NOT NULL COMMENT '主键',
-  `seter` varchar(10) DEFAULT NULL COMMENT '集',
+  `seter` varchar(10) DEFAULT NULL COMMENT '集名',
   `name` varchar(30) DEFAULT NULL COMMENT '名称',
   `cover` varchar(30) DEFAULT NULL COMMENT '封面',
+  `qr_code` varchar(150) DEFAULT NULL COMMENT '二维码',
+  `exhibition` varchar(150) DEFAULT NULL COMMENT '展示图',
   `topic` varchar(30) DEFAULT NULL COMMENT '主旨',
   `purpose` varchar(30) DEFAULT NULL COMMENT '用途',
-  `describe` varchar(100) DEFAULT NULL COMMENT '描述',
+  `description` varchar(100) DEFAULT NULL COMMENT '描述',
+  `rate` float DEFAULT 0 COMMENT '评分',
   `kind` int DEFAULT -1 COMMENT '类别',
   `charpter` int DEFAULT -1 COMMENT '章节',
   `section` int DEFAULT 0 COMMENT '小节',
   `fin_charpter` int DEFAULT 0 COMMENT '完成章节',
   `fin_section` int DEFAULT 0 COMMENT '完成小节',
   `form` varchar(20) DEFAULT NULL COMMENT '形式',
-  `partner` bigint DEFAULT 0 COMMENT '参与创作者',
+  `partner` bigint DEFAULT 0 COMMENT '创作者',
   `views` bigint DEFAULT 0 COMMENT '浏览量',
   `copyright` int DEFAULT 0 COMMENT '版权',
-  `reward` varchar(30) DEFAULT NULL COMMENT '奖池',
-  `deadline` date DEFAULT NULL COMMENT '截至日期',
+  `reward` varchar(30) DEFAULT NULL COMMENT '版费',
+  `deadline` date DEFAULT NULL COMMENT '期限',
   `publisher` varchar(20) DEFAULT NULL COMMENT '出品方',
   `is_top` int DEFAULT 0 COMMENT '置顶',
+  `source` varchar(3) DEFAULT NULL COMMENT '来源',
   `finish` int DEFAULT 0 COMMENT '完成',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='诗歌创作表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='诗歌创作集';
 
 DROP TABLE IF EXISTS `t_pro_poemset`;
 CREATE TABLE `t_pro_poemset` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `charpter` varchar(20) DEFAULT NULL COMMENT '章节题',
-  `describe` varchar(300) DEFAULT NULL COMMENT '章节介绍',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `charpter` varchar(20) DEFAULT NULL COMMENT '题',
+  `description` varchar(300) DEFAULT NULL COMMENT '章节介绍',
+  `pic` varchar(100) DEFAULT NULL COMMENT '图片',
   `requirement` varchar(300) DEFAULT NULL COMMENT '创作要求',
   `root` int DEFAULT 0 COMMENT '根',
-  `root_id` bigint DEFAULT 0 COMMENT '分作id',
-  `liter_id` bigint DEFAULT 0 COMMENT '文章id',
-  `paint_id` bigint DEFAULT 0 COMMENT '画作id',
+  `root_id` bigint DEFAULT 0 COMMENT '分集编号',
+  `liter_id` bigint DEFAULT 0 COMMENT '关联文章编号',
+  `paint_id` bigint DEFAULT 0 COMMENT '关联绘画编号',
   `creators` int DEFAULT 0 COMMENT '创作人员数',
   `number` int DEFAULT 0 COMMENT '数量',
-  `root_ord` int DEFAULT 0 COMMENT '父类序号',
+  `root_ord` int DEFAULT 0 COMMENT '根序号',
   `ord` int DEFAULT 0 COMMENT '序号',
-  `poetry_id` varchar(30) DEFAULT NULL COMMENT '诗歌id',
+  `poetry_id` varchar(30) DEFAULT NULL COMMENT '诗歌集编号',
+  `is_lock` int DEFAULT 1 COMMENT '锁',
   `finish` int DEFAULT 0 COMMENT '完成',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='诗歌创作章节表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='诗歌作品分集';
 
-DROP TABLE IF EXISTS `t_pro_paint_content`;
-CREATE TABLE `t_pro_paint_content` (
+DROP TABLE IF EXISTS `t_pro_poetry_content`;
+CREATE TABLE `t_pro_poetry_content` (
   `no` varchar(34) NOT NULL COMMENT '主键',
-  `brand` varchar(20) DEFAULT NULL COMMENT '词牌',
-  `title` varchar(20) DEFAULT NULL COMMENT '标题',
+  `title` varchar(20) DEFAULT NULL COMMENT '词名',
+  `brand` varchar(20) DEFAULT NULL COMMENT '牌名',
   `content` varchar(300) DEFAULT NULL COMMENT '内容',
-  `charp_id` varchar(30) DEFAULT NULL COMMENT '章节id',
-  `poetry_id` varchar(34) DEFAULT NULL COMMENT '诗歌集id',
-
-  `poetry_name` varchar(30) DEFAULT NULL COMMENT '诗歌集名称',
-  `charp_name` varchar(30) DEFAULT NULL COMMENT '章节名称',
-  `sec_name` varchar(30) DEFAULT NULL COMMENT '小节名称',
-  `likes` int DEFAULT 0 COMMENT '喜欢数',
-  `recom_no` int DEFAULT 0 COMMENT '推荐数',
+  `charp_id` varchar(30) DEFAULT NULL COMMENT '章节编号',
+  `charp_name` varchar(30) DEFAULT NULL COMMENT '章名',
+  `sec_name` varchar(30) DEFAULT NULL COMMENT '节名',
+  `poetry_id` varchar(34) DEFAULT NULL COMMENT '作品编号',
+  `poetry_name` varchar(30) DEFAULT NULL COMMENT '作品名称',
+  `likes` int DEFAULT 0 COMMENT '喜欢',
+  `recom_no` int DEFAULT 0 COMMENT '推荐',
+  `views` int DEFAULT 0 COMMENT '展示',
   `adopt` int DEFAULT 0 COMMENT '采纳',
-  `favorer` text DEFAULT NULL COMMENT '点赞用户字串',
+  `favorer` text DEFAULT NULL COMMENT '点赞用户',
+  `creator` varchar(60) DEFAULT NULL COMMENT '创建人',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
   `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
   `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
-  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  `is_del` int DEFAULT 0 COMMENT '删除',
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='诗歌创作内容表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='诗歌创作内容';
 
 DROP TABLE IF EXISTS `t_quo_analect`;
 CREATE TABLE `t_quo_analect` (
@@ -656,11 +693,22 @@ CREATE TABLE `t_sys_user_pro` (
 DROP TABLE IF EXISTS `t_pro_user_adopt`;
 CREATE TABLE `t_pro_user_adopt` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `pro_no` varchar(34) DEFAULT null COMMENT '创作编号',
+  `title` varchar(30) DEFAULT null COMMENT '标题',
+  `content` varchar(500) DEFAULT null COMMENT '内容',
+  `picture` varchar(500)  DEFAULT null COMMENT '图片',
+  `liter_text` text  COMMENT '文章',
+
   `creation_id` varchar(34) DEFAULT 0 COMMENT '创作id',
+  `creation_nm` varchar(34) DEFAULT null COMMENT '创作名称',
+  `charp_nm` varchar(30) DEFAULT null COMMENT '章节名称',
   `charp_id` bigint DEFAULT 0 COMMENT '章节id',
+/*  `part_id` bigint DEFAULT 0 COMMENT '分作id',
+  `set_id` bigint DEFAULT 0 COMMENT '小集id',*/
   `content_id` varchar(34) DEFAULT NULL COMMENT '内容id',
   `typ` int DEFAULT 0 COMMENT '类型',
   `user_id` varchar(40) DEFAULT NULL COMMENT '用户id',
+  `nickname` varchar(40) DEFAULT NULL COMMENT '用户名',
   `avatar` varchar(100) DEFAULT NULL COMMENT '头像url',
   `adopt` int DEFAULT 0 COMMENT '采纳',
   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
@@ -669,6 +717,44 @@ CREATE TABLE `t_pro_user_adopt` (
   `is_del` int DEFAULT 0 COMMENT '是否删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户创作采纳表';
+
+DROP TABLE IF EXISTS `t_pro_sale`;
+CREATE TABLE `t_pro_sale` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `pro_no` varchar(34) DEFAULT null COMMENT '作品编号',
+  `typ` int DEFAULT 0 COMMENT '作品类型',
+  `create_typ` varchar(3) DEFAULT null COMMENT '创作类型',
+  `title` varchar(30) DEFAULT null COMMENT '标题',
+  `seter` varchar(30) DEFAULT null COMMENT '集',
+  `cover` varchar(250) DEFAULT null COMMENT '封面',
+  `exhibition` varchar(250)  DEFAULT null COMMENT '展示',
+  `label` varchar(100)  DEFAULT null COMMENT '标签',
+  `description` varchar(300) DEFAULT null COMMENT '描述',
+  `sale_amt` DECIMAL DEFAULT null COMMENT '售价',
+  `deadline` datetime DEFAULT NULL COMMENT '截至时间',
+  `sale_status` varchar(1) DEFAULT null COMMENT '状态',
+  `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
+  `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
+  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
+  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='作品上架表';
+
+DROP TABLE IF EXISTS `t_pro_rate_recom`;
+CREATE TABLE `t_pro_rate_recom` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `creation_id` int DEFAULT 0 COMMENT '创作id',
+  `typ` int DEFAULT 0 COMMENT '作品类型',
+  `content` varchar(300) DEFAULT NULL COMMENT '用户id',
+  `rate` int DEFAULT 0 COMMENT '评分',
+  `creator` varchar(30) DEFAULT null COMMENT '创建人',
+  `creator_avat` varchar(100) DEFAULT null COMMENT '头像',
+  `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
+  `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
+  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
+  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='作品用户评分表';
 
 
 DROP TABLE IF EXISTS `t_pro_user_product`;
@@ -686,6 +772,60 @@ CREATE TABLE `t_pro_user_product` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户收录作品表';
 
+
+DROP TABLE IF EXISTS `t_sea_record`;
+CREATE TABLE `t_sea_record` (
+  `key` varchar(60) NOT NULL  COMMENT '主键',
+  `count` bigint DEFAULT 0 COMMENT '创作id',
+  `sea_type` int DEFAULT 0 COMMENT '作品类型',
+  `url_id` varchar(40) DEFAULT NULL COMMENT '用户id',
+  `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
+  `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
+  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
+  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户搜索关键词表';
+
+
+DROP TABLE IF EXISTS `t_pro_sub_topic`;
+CREATE TABLE `t_pro_sub_topic` (
+  `topic_id` varchar(33) NOT NULL AUTO_INCREMENT COMMENT '主题id',
+  `topic` varchar(60) DEFAULT 0 COMMENT '主题',
+  `creator` int DEFAULT 0 COMMENT '创作者数量',
+  `product_nm` varchar(40) DEFAULT NULL COMMENT '用户id',
+  `description` varchar(200) DEFAULT NULL COMMENT '描述',
+  `rank` int DEFAULT 0 COMMENT '等级',
+  `grade` int DEFAULT 0 COMMENT '分值',
+  `label1` varchar(30) DEFAULT 0 COMMENT '标签1',
+  `label2` varchar(30) DEFAULT NULL COMMENT '标签2',
+  `label3` varchar(30) DEFAULT NULL COMMENT '标签3',
+  `logo` varchar(300) DEFAULT NULL COMMENT 'logo',
+  `dn`  varchar(3) DEFAULT NULL COMMENT '简称',
+   `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
+  `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
+  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
+  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`topic_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='专题表';
+
+
+DROP TABLE IF EXISTS `t_pro_copyright`;
+CREATE TABLE `t_pro_copyright` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `pro_no` varchar(34) DEFAULT null COMMENT '创作编号',
+  `creation_id` varchar(34) DEFAULT NULL COMMENT '作品编号',
+  `createTyp` int DEFAULT 0 COMMENT '作品类型',
+  `copyright` DECIMAL DEFAULT null COMMENT '版权',
+  `author` varchar(34) DEFAULT null COMMENT '作者id',
+  `file_str` varchar(500)  DEFAULT null COMMENT '材料文件',
+  `allotType` varchar(1) DEFAULT NULL COMMENT '分配方式',
+  `role` varchar(1) DEFAULT NULL COMMENT '作品角色',
+  `create_by` varchar(35) DEFAULT NULL COMMENT '创建人Id',
+  `create_dat` datetime DEFAULT NULL COMMENT '创建时间',
+  `l_update_dat` datetime DEFAULT NULL COMMENT '最后更新时间',
+  `is_del` int DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='作品版权分配表';
 
 -- 触发器，每插入一条作品采纳表记录，将对应的内容表设置为完成
 DELIMITER |

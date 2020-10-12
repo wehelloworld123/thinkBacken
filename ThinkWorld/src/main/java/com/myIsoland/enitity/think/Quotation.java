@@ -16,6 +16,8 @@ public class Quotation extends BaseEntity implements Serializable{
     private int id;
     @TableField(value = "num")
     private String num;
+    @TableField(value = "question")
+    private String question;
     @TableField(value = "content")
     private String content;
     @TableField(value = "explation")

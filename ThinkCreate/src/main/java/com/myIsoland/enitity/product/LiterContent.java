@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myIsoland.common.base.BaseEntity;
+import com.myIsoland.enitity.system.TsysUser;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @TableName("t_pro_content")
@@ -41,6 +43,8 @@ public class LiterContent extends BaseEntity implements Serializable {
     private String charpName;
     @TableField(value = "sec_name")
     private String secName;
+    @TableField(value = "creator")
+    private String creator;
     @TableField(exist = false)
     private String bookName;
     @TableField(exist = false)
@@ -50,12 +54,19 @@ public class LiterContent extends BaseEntity implements Serializable {
     private String favorer;
     @TableField(exist = false)
     private int creators;
+    @TableField(exist = false)
+    Map userInfo;
+    @TableField(exist = false)
     List<Recommend> recommends;
 
     public LiterContent() {
         super();
     }
-
+    public LiterContent(String no,int likes,String favorer) {
+       this.no = no;
+       this.likes = likes;
+       this.favorer =favorer;
+    }
     public LiterContent(String title,String summary,String content, String file, Long charpId, int view) {
         this.title = title;
         this.summary = summary;

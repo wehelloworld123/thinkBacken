@@ -1,16 +1,16 @@
 package com.myIsoland.service.product;
 
+import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.myIsoland.annotation.DataSource;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.constant.ProjectConstant;
-import com.myIsoland.enitity.product.Recommend;
-import com.myIsoland.enums.DataSourceEnum;
+import com.myIsoland.enitity.product.Recommend;;
 import com.myIsoland.enums.RecomType;
 import com.myIsoland.mapper.product.RecommendMapper;
+import com.myIsoland.model.ResultSet;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -30,26 +30,44 @@ public class RecommendServiceImpl extends ServiceImpl<RecommendMapper,Recommend>
     }
 
     @Override
+    public int DelLikeSts(String userId, Long id) {
+        userId = userId + ";";
+        return this.baseMapper.delLikeSts(userId,id);
+    }
+
+    @Override
     public int UpdateRecomment(Recommend data) {
         return this.baseMapper.updateById(data);
     }
 
     @Override
-    public List<Recommend> GetRecommentByContentId(int id,int start) {
-        IPage<Recommend> curPage = new Page<>(start,15);
-        curPage = this.baseMapper.selectPage(curPage,new QueryWrapper<Recommend>().eq("content_id",id).eq("is_del",0).orderByDesc("create_dat"));
-        return curPage.getRecords();
+    public List<Recommend> GetRecommentByContentId(String id,int start) {
+
+        PageHelper.offsetPage(start,15,true);
+        return this.baseMapper.selectList(new QueryWrapper<Recommend>().eq("content_id",id).eq("is_del",0).orderByDesc("create_dat"));
+
     }
 
     @Override
-    public List<Recommend> GetRecommentByDate(String no, Date date, RecomType type, int start) {
-        if (RecomType.LITERATURE.equals(type)){
-            no = ProjectConstant.CLITERPREFIX + no;
-        }else if(RecomType.PAINTING.equals(type)){
-            no = ProjectConstant.CLITERPREFIX + no;
-        }else if(RecomType.POEMTY.equals(type)){
-            no = ProjectConstant.CLITERPREFIX + no;
-        }
-        return this.baseMapper.selectRecommendByDate(no,date,type.getValue(),start);
+    public List<Recommend> GetRecommentByDate(String userId,String no, Date date, RecomType type, int start,int limit) {
+        return this.baseMapper.selectRecommendByDate(userId,no,date,type.getValue(),start,limit);
+    }
+
+    @Override
+    public ResultSet<Recommend> GetUserRecommentByDate(String userId, Date date, RecomType type, int start, int limit) {
+        PageHelper.offsetPage(start,limit,true);
+        QueryWrapper<Recommend> wrapper = new QueryWrapper<>();
+        wrapper.select("id","title","substring(content,1,200) as content","summary","typ as kind","contentId","adopt","create_dat as createDat")
+                .lambda()
+                .eq(Recommend::getCreateBy,userId)
+                .eq(Recommend::getKind,type.getValue())
+                .le(Recommend::getCreateDat,date)
+                .eq(Recommend::getAdopt,1);
+        List<Recommend> list = this.baseMapper.selectList(wrapper);
+        PageInfo<Recommend> pageInfo = new PageInfo<>(list);
+        ResultSet<Recommend> resultSet = new ResultSet<>();
+        resultSet.setList(list);
+        resultSet.setCount(pageInfo.getTotal());
+        return  resultSet;
     }
 }

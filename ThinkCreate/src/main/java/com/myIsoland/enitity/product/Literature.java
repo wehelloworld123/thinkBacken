@@ -4,15 +4,20 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.enums.CreateKind;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @TableName("t_pro_liter")
 @KeySequence("literature")
+@Document(indexName="literature",type = "doc")
 public class Literature extends BaseEntity implements Serializable{
+    @Id
     @TableId(value = "uid")
     private String uid;
     @TableField(value = "name")
@@ -27,6 +32,8 @@ public class Literature extends BaseEntity implements Serializable{
     private String introduce;
     @TableField(value = "description")
     private String description;
+    @TableField(value = "rate")
+    private float rate;
     @TableField(value = "kind")
     private int kind;
     @TableField(value = "charpter")
@@ -47,6 +54,9 @@ public class Literature extends BaseEntity implements Serializable{
     private Date deadline;
     @TableField(value = "publisher")
     private String publisher;
+    @TableField(value = "source")
+    private String source;
+
 
     @TableField(value = "partner")
     private int partner;

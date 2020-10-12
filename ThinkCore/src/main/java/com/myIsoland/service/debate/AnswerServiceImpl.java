@@ -2,7 +2,11 @@ package com.myIsoland.service.debate;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.common.util.CaculateUtils;
 import com.myIsoland.common.util.SnowflakeIdWorker;
 import com.myIsoland.common.util.StringUtils;
@@ -11,6 +15,7 @@ import com.myIsoland.enitity.debate.Answer;
 import com.myIsoland.enitity.debate.Recommend;
 import com.myIsoland.enitity.system.TsysUser;
 import com.myIsoland.mapper.debate.AnswerMapper;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.shiro.util.ShiroUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +25,16 @@ import java.util.Map;
 
 @Service
 public class AnswerServiceImpl extends ServiceImpl<AnswerMapper,Answer> implements AnswerService {
+
+
     @Override
-    public int AddAnsLikes(int ansId) {
-        return this.baseMapper.updateAnsLike(ansId);
+    public int delLikeSts(String ansId, String userId) {
+        return this.baseMapper.delLikeSts(userId,ansId);
+    }
+
+    @Override
+    public int addLikeSts(String ansId, String userId) {
+        return this.baseMapper.updateLikeSts(userId,ansId);
     }
 
     @Override
@@ -30,14 +42,59 @@ public class AnswerServiceImpl extends ServiceImpl<AnswerMapper,Answer> implemen
         return null;
     }
 
+
+    /**
+     * 根据日期获取最新的用户立论排序
+     * @param topicId
+     * @param date
+     * @param start
+     * @param limit
+     * @return
+     */
     @Override
-    public List<Answer> GetNewAnsById(String topicId, Date date, int start) {
-        return deleteAnsListPrefix(this.baseMapper.queryAnsAndRecById(topicId,date,start));
+    public List<Answer> GetAnswersByDate(String topicId, Date date, int start,int limit) {
+  /*      PageHelper.offsetPage(start,limit,true);
+        QueryWrapper<Answer> wrapper = new QueryWrapper<>();
+
+        wrapper.select("no","substring(content,1,300) as content","likes","recommend","topic_id as topicId","creator","creator_avat as creatorAvat","createBy")
+                .lambda().eq(Answer::getTopicId,topicId)
+                .le(Answer::getCreateDat,date)
+                .eq(Answer::getIsDel,0)
+                .orderByDesc(Answer::getCreateDat);
+        List<Answer> list = this.baseMapper.selectList(wrapper);
+        PageInfo<Answer> pageInfo = new PageInfo<>(list);
+        ResultSet<Answer> resultSet = new ResultSet<>();
+        resultSet.setList(list);
+        resultSet.setCount(pageInfo.getTotal());*/
+        return  this.baseMapper.queryAnsAndRecByDate(topicId,date,start,limit);
     }
 
+    /**
+     * 根据topicid获取
+     * @param topicId
+     * @param date
+     * @param likes
+     * @param recoms
+     * @param start
+     * @param limit
+     * @return
+     */
     @Override
-    public List<Answer> GetAdvanceAnsById(String topicId, Date date, int start) {
-        return deleteAnsListPrefix(this.baseMapper.queryHotAnsAndRecById(topicId,date,start));
+    public List<Answer> GetAdvanceAnsByTopicId(String topicId,Date date,int likes,int recoms,int start,int limit) {
+       /* PageHelper.offsetPage(start,limit,true);
+        QueryWrapper<Answer> wrapper = new QueryWrapper<>();
+
+        wrapper.select("no","substring(content,1,300) as content","likes","recommend","topic_id as topicId","creator","creator_avat as creatorAvat","createBy")
+                .lambda().eq(Answer::getTopicId,topicId)
+                .le(Answer::getCreateDat,date)
+                .eq(Answer::getIsDel,0)
+                .orderByDesc(Answer::getCreateDat);
+        List<Answer> list = this.baseMapper.selectList(wrapper);
+        PageInfo<Answer> pageInfo = new PageInfo<>(list);
+        ResultSet<Answer> resultSet = new ResultSet<>();
+        resultSet.setList(list);
+        resultSet.setCount(pageInfo.getTotal());*/
+        return  this.baseMapper.queryHotAnsAndRecByTopicId(topicId,date,likes,recoms,start,limit);
     }
 
     @Override
@@ -47,7 +104,7 @@ public class AnswerServiceImpl extends ServiceImpl<AnswerMapper,Answer> implemen
                 .gt(Answer::getCreateDat,date)
                 .orderByDesc(Answer::getCreateDat)
                 .last("LIMIT 10")
-                .select(Answer::getNo,Answer::getSummary,Answer::getLikes,Answer::getRecommend,
+                .select(Answer::getNo,Answer::getConclusion,Answer::getLikes,Answer::getRecommend,
                         Answer::getCreator,Answer::getCreatorAvat,Answer::getCreateDat,Answer::getCreateBy);
         return deleteAnsListPrefix(this.baseMapper.selectList(wrapper));
     }
@@ -61,15 +118,20 @@ public class AnswerServiceImpl extends ServiceImpl<AnswerMapper,Answer> implemen
                 .gt(Answer::getCreateDat,date)
                 .orderByDesc(Answer::getGrade)
                 .last("LIMIT 10")
-                .select(Answer::getNo,Answer::getSummary,Answer::getLikes,Answer::getRecommend,
+                .select(Answer::getNo,Answer::getConclusion,Answer::getLikes,Answer::getRecommend,
                         Answer::getCreator,Answer::getCreatorAvat,Answer::getCreateDat,Answer::getCreateBy);
         List<Answer> data = this.baseMapper.selectList(wrapper);
         return deleteAnsListPrefix(data);
     }
 
     @Override
-    public Answer GetAnswerById(String no) {
-        Answer data = this.baseMapper.selectById(no);
+    public Answer GetAnswerById(String no,String userId) {
+        QueryWrapper<Answer> wrapper = new QueryWrapper<>();
+        wrapper.select("no","content","conclusion","likes","creator","creator_avat as creatorAvat","instr(favorer,"+userId+") as islike","recommend","createBy","create_dat as createDat")
+                .lambda()
+                .eq(Answer::getNo,no)
+                .eq(BaseEntity::getIsDel,0);
+        Answer data = this.baseMapper.selectOne(wrapper);
         data.setNo(CaculateUtils.translateId(ProjectConstant.ANSPREFIX,data.getNo()));
         return deletePrefix(data);
     }

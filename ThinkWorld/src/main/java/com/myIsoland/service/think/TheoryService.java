@@ -26,11 +26,12 @@ public interface TheoryService extends IService<Theory> {
     /**
      *@Author:THINKPAD
      *@Description:根据更新理论记录
-     * @param data
+     * @param islock
+     * @param userid
      *@Return:int
      *@Data:18:08 2019/12/29
      **/
-    int UpdateTheoryById(Theory data);
+    int UpdateTheoryByUserId(int islock,String userid);
 
     /**
      *@Author:THINKPAD

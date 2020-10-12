@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myIsoland.common.base.BaseEntity;
+import com.myIsoland.model.UserInfo;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @TableName("t_pro_poem_content")
@@ -46,6 +48,9 @@ public class PoemContent extends BaseEntity implements Serializable {
     private String favorer;
     @TableField(exist = false)
     private int creators;
+    @TableField(exist = false)
+    Map userInfo;
+    @TableField(exist = false)
     List<Recommend> recommends;
 
     public PoemContent(){

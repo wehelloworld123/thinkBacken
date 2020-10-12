@@ -47,11 +47,11 @@
 			<version>4.1.1.0</version>
 		</dependency>
 		<!-- Thread多线程 -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>1.3.0</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-configuration-processor</artifactId>
@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus</artifactId>
-			<version>3.0.3</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -159,8 +159,8 @@
 		<!-- pageHelper -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper</artifactId>
-			<version>4.1.4</version>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>1.2.5</version>
 		</dependency>
 
 		<!--druid 数据源监控-->

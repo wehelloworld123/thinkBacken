@@ -1,7 +1,7 @@
 package com.myIsoland.constant;
 
 public class ProjectConstant {
-    public static final String USERPREFIX = "THINK";
+    public static final String USERPREFIX = "TU-";
 
     public static final String PAINTINGPREFIX = "TPAINT";//绘画编号前缀
 
@@ -20,4 +20,8 @@ public class ProjectConstant {
     public static final String LITERATURE = "LITERATURE";
 
     public static final String POETRY = "POETRY";
+    
+    public static final String ANSPREFIX = "ANS";//立论前缀
+
+    public static final String TOPICPREFIX = "TOPIC";//论题前缀
 }

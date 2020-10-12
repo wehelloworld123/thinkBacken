@@ -1,13 +1,16 @@
 package com.myIsoland.controller.creation;
 
+import com.myIsoland.common.component.RedisCacheService;
 import com.myIsoland.common.domain.AjaxResult;
 import com.myIsoland.common.util.CaculateUtils;
 import com.myIsoland.common.util.DateUtils;
 import com.myIsoland.common.util.SnowflakeIdWorker;
 import com.myIsoland.constant.ProjectConstant;
+import com.myIsoland.constant.RedisConstant;
 import com.myIsoland.enitity.product.PoemContent;
 import com.myIsoland.enitity.product.PoemSet;
 import com.myIsoland.enums.CodeEnum;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.service.product.PoemContentService;
 import com.myIsoland.service.product.PoemSetService;
 import com.myIsoland.shiro.util.ShiroUtils;
@@ -31,6 +34,8 @@ public class PoemCreationController {
     private PoemContentService poemContentService;
     @Autowired
     private PoemSetService poemSetService;
+    @Autowired
+    private RedisCacheService redisCacheService;
     /**
      *@Author:THINKPAD
      *@Description:初始化诗歌创作信息
@@ -42,18 +47,39 @@ public class PoemCreationController {
     @GetMapping("/readPoemSetDetail")
     public Object ReadPoemSetDetail(Long charptId, String date){
         Map<String,Object> data = new HashMap<>();
-        String userId = ShiroUtils.getUserId();
-        PoemSet chapter = poemSetService.GetPoemSetDetail(charptId);
-        List<PoemContent> creations = poemContentService.GetHotPoemContent(userId,charptId);
-        List<String> arr = new LinkedList<>();
-        for (PoemContent content : creations){
-            arr.add(ProjectConstant.CPOETRYPREFIX + content.getNo());
+        PoemSet poemSet = poemSetService.GetPoemSetDetail(charptId);
+        if(poemSet.getFinish()==1){
+            PoemContent content = poemContentService.GetAdoptPoemContent(charptId);
+            data.put("creation",CaculateUtils.deletePrefix(content));
         }
-        List<PoemContent> contents = poemContentService.GetContentsOrderByDate(userId,charptId, DateUtils.parseDate(date),arr);
-        data.put("chapter", CaculateUtils.deletePrefix(chapter));
-        data.put("creations",CaculateUtils.deletePoemsPrefix(creations));
-        data.put("contents",CaculateUtils.deletePoemsPrefix(contents));
+/*        List<PoemContent> creations = poemContentService.GetHotPoemContent(null,charptId);
+        data.put("creations",CaculateUtils.deletePoemsPrefix(creations));*/
+
+        data.put("chapter", CaculateUtils.deletePrefix(poemSet));
         return AjaxResult.success(data);
+    }
+
+
+
+    /**
+     *@Author:THINKPAD
+     *@Description:初始化诗歌创作信息
+     * @param no
+     * @param isLogin
+     *@Return:java.lang.Object
+     *@Data:16:43 2020/1/30
+     **/
+    @GetMapping("/readPoemContentDetail")
+    public Object ReadPoemContentDetail(String no, Boolean isLogin){
+        no = ProjectConstant.CPOETRYPREFIX + no;
+        String userId = null;
+        if(isLogin){
+            userId = ShiroUtils.getUserId();
+        }
+
+        PoemContent poemContent = poemContentService.GetPoemContentById(no,userId);
+
+        return AjaxResult.success(CaculateUtils.deletePrefix(poemContent));
     }
 
     /**
@@ -63,11 +89,24 @@ public class PoemCreationController {
      *@Return:java.lang.Object
      *@Data:13:42 2020/2/4
      **/
-    @GetMapping("/modifyLikesSts")
-    public Object ModifyLikesSts(String no){
+    @PostMapping("/modifyLikesSts")
+    public Object ModifyLikesSts(String no,int type){
         String userId = ShiroUtils.getUserId();
-        no = ProjectConstant.CLITERPREFIX + no;
-        poemContentService.UpdateLikeSts(userId,no);
+        no = ProjectConstant.CPOETRYPREFIX + no;
+
+        if (type==1){
+            redisCacheService.setHashValue(RedisConstant.CPOETRY+no,userId,"1");
+            System.out.println(redisCacheService.getHashMap(RedisConstant.CPOETRY+no));
+        }else if(type==0){
+            Boolean b = redisCacheService.hashFieldExist(RedisConstant.CPOETRY+no,userId);
+            if(b){
+                if(redisCacheService.delHashField(RedisConstant.CPOETRY+no,userId).equals(0)){
+                    return AjaxResult.error(CodeEnum.REDIS_EXCEPTION.getCode(),CodeEnum.REDIS_EXCEPTION.getMessage(),null);
+                }
+            }else {
+                poemContentService.DelLikeSts(userId,no);
+            }
+        }
         return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
     }
 
@@ -80,10 +119,11 @@ public class PoemCreationController {
      *@Data:17:19 2020/1/30
      **/
     @GetMapping("/readNextPoemPro")
-    public Object ReadNextPoemPro(Long charptId,String date){
-        List<PoemContent> contents = poemContentService.GetContentsOrderByDate
-                (ShiroUtils.getUserId(),charptId,DateUtils.parseDate(date),new LinkedList<>());
-        return AjaxResult.success(CaculateUtils.deletePoemsPrefix(contents));
+    public Object ReadNextPoemPro(Long charptId,String date,int start,int limit){
+        ResultSet<PoemContent> resultSet = poemContentService.GetContentsOrderByDate
+                (charptId,DateUtils.parseDate(date),start,limit,new LinkedList<>());
+        resultSet.setList(CaculateUtils.deletePoemsPrefix(resultSet.getList()));
+        return AjaxResult.success(resultSet);
 
     }
 
@@ -99,15 +139,17 @@ public class PoemCreationController {
      *@Data:23:38 2020/1/30
      **/
     @PostMapping("/createPoemContent")
-    public Object CreatePoemContent(String brand,String title,Long chartId,String poetryName,String charptName,String secName){
+    public Object CreatePoemContent(String brand,String title,String content,Long id){
+        Map<String,Object> map = poemSetService.GetPoetryBySetId(id);
         PoemContent data = new PoemContent();
         data.setNo(ProjectConstant.CPOETRYPREFIX+ SnowflakeIdWorker.getUUID());
         data.setBrand(brand);
         data.setTitle(title);
-        data.setCharpId(chartId);
-        data.setPoetryName(poetryName);
-        data.setCharpName(charptName);
-        data.setSecName(secName);
+        data.setCharpId(id);
+        data.setContent(content);
+        data.setPoetryName((String) map.get("poetryName"));
+        data.setCharpName((String) map.get("charptName"));
+        data.setSecName((String) map.get("secName"));
         poemContentService.save(data);
         return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
     }

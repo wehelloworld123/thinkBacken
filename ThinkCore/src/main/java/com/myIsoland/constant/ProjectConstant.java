@@ -1,17 +1,27 @@
 package com.myIsoland.constant;
-/**
- * 工程数据库常量值，切记修改，需多次备份
- * @ClassName: ProjectConstant
- * @author xuyong
- * @date 2020年1月25日
- *
- */
+
 public class ProjectConstant {
-    public static final String USERPREFIX = "THINK";//用户id前缀
+    public static final String USERPREFIX = "THINK";
 
-    public static final String TOPICPREFIX = "TOPIC";//立论前缀
+    public static final String PAINTINGPREFIX = "TPAINT";//绘画编号前缀
 
-    public static final String ANSPREFIX = "TANS";//立论回答前缀
+    public static final String LITERPREFIX = "TLITER";//文学编号前缀
 
+    public static final String POETRYPREFIX = "TPOETRY";//诗歌编号前缀
 
+    public static final String CPAINTINGPREFIX = "CPAINT";//绘画作品编号前缀
+
+    public static final String CLITERPREFIX = "CLITER";//文学作品编号前缀
+
+    public static final String CPOETRYPREFIX = "CPOETRY";//诗歌作品编号前缀
+
+    public static final String PAINT = "PAINT";
+
+    public static final String LITERATURE = "LITERATURE";
+
+    public static final String ANSPREFIX = "ANS";//立论前缀
+
+    public static final String TOPICPREFIX = "TOPIC";//论题前缀
+
+    public static final String POETRY = "POETRY";
 }

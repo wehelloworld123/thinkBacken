@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.enitity.think.Theory;
 import com.myIsoland.mapper.think.TheoryMapper;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,13 @@ public class TheoryServiceImpl extends ServiceImpl<TheoryMapper,Theory> implemen
     }
 
     @Override
-    public int UpdateTheoryById(Theory data) {
-        return this.baseMapper.updateById(data);
+    public int UpdateTheoryByUserId(int islock,String userid) {
+        Theory data = new Theory();
+        UpdateWrapper<Theory> wrapper = new UpdateWrapper<>();
+        wrapper.set("is_lock",islock)
+                .lambda()
+                .eq(BaseEntity::getCreateBy,userid);
+        return this.baseMapper.update(data,wrapper);
     }
 
     @Override

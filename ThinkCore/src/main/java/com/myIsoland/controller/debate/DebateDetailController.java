@@ -41,11 +41,7 @@ public class DebateDetailController {
      **/
     @GetMapping("/readTopicDetail")
     public Object ReadTopicDetail(String id){
-        try{
             return AjaxResult.success(topicService.GetTopicTetail(id));
-        }catch (Exception e){
-            return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
     }
     /**
      *@Author:THINKPAD
@@ -55,13 +51,9 @@ public class DebateDetailController {
      *@Data:0:43 2020/1/26
      **/
     @GetMapping("/readTopicAns")
-    public Object ReadTopicAns(String id,String date,int page){
-        try{
-            topicService.GetTopicTetail(id);
-            return AjaxResult.success(answerService.GetNewAnsById(id, DateUtil.parseDate(date),page));
-        }catch (Exception e){
-            return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
+    public Object ReadTopicAns(String id,String date,int start,int limit){
+            return AjaxResult.success(answerService.GetAnswersByDate(id, DateUtil.parseDate(date),start,limit));
+
     }
 
     /**
@@ -74,12 +66,10 @@ public class DebateDetailController {
      *@Data:18:54 2020/1/26
      **/
     @GetMapping("/readAdvanceAns")
-    public Object ReadAdvanceAns(String id,String date,int page){
-        try{
-            return AjaxResult.success(answerService.GetAdvanceAnsById(id,DateUtil.parseDate(date),page));
-        }catch (Exception e){
-            return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
+    public Object ReadAdvanceAns(String id,String date,int likes,int recoms,int start,int limit){
+
+        return AjaxResult.success(answerService.GetAdvanceAnsByTopicId(id,DateUtil.parseDate(date),likes,recoms,start,limit));
+
     }
 
     /**
@@ -92,48 +82,19 @@ public class DebateDetailController {
      *@Data:23:23 2020/1/26
      **/
     @PostMapping("/createAnswer")
-    public Object CreateAnswer(String content,String summary,String topicId){
+    public Object CreateAnswer(String content,String conclusion,String topicId){
         Answer data = new Answer();
         data.setContent(content);
-        data.setSummary(summary);
+        data.setConclusion(conclusion);
         data.setTopicId(ProjectConstant.TOPICPREFIX + topicId);
-        try {
-            int i = answerService.InsertAnswer(data);
-            if(THINKConstant.SQL_SUCCESS.equals(i)){
-                return AjaxResult.success(THINKConstant.SQL_SUCCESS_MSG);
-            }else{
-                return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,THINKConstant.SQL_FAIL_MSG);
-            }
-        }catch (Exception e){
-            return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
+        answerService.InsertAnswer(data);
+        return AjaxResult.success(data);
+
+
     }
 
 
-    /**
-     *@Author:THINKPAD
-     *@Description:创建评论
-     * @param content
-     * @param ansId
-     *@Return:java.lang.Object
-     *@Data:23:32 2020/1/26
-     **/
-    @PostMapping("/createRecommend")
-    public Object CreateRecommend(String content,String ansId){
-        Recommend data = new Recommend();
-        data.setContent(content);
-        data.setParentId(ProjectConstant.ANSPREFIX+ansId);
-        try {
-            int i = recommendService.SaveRecommend(data);
-            if(THINKConstant.SQL_SUCCESS.equals(i)){
-                return AjaxResult.success(THINKConstant.SQL_SUCCESS_MSG);
-            }else{
-                return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,THINKConstant.SQL_FAIL_MSG);
-            }
-        }catch (Exception e){
-            return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
-        }
-    }
+
     /**
      *@Author:THINKPAD
      *@Description:获取推荐内容
@@ -142,12 +103,12 @@ public class DebateDetailController {
      *@Return:java.lang.Object
      *@Data:23:42 2020/1/26
      **/
-    @GetMapping("/readRecommends")
+/*    @GetMapping("/readRecommends")
     public Object ReadRecommends(String ansId,String date){
         try{
             return AjaxResult.success(recommendService.GetNextRecom(ansId,DateUtil.parseDate(date)));
         }catch (Exception e){
             return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
         }
-    }
+    }*/
 }

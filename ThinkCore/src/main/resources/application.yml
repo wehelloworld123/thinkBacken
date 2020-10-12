@@ -1,4 +1,3 @@
-
 # 项目相关配置
 fuce:
   #名称
@@ -10,6 +9,8 @@ fuce:
   #头像上传路径
   profile: D:/profile/
   #地址是否放入项目static目录，如果未Y 放入static。 profile配置失效
+  #文件上传路径
+  defaultBaseDir: D:/v2file/
   isstatic: Y
   #开启存放静态文件夹后目录
   isroot_dir: static/images_upload/
@@ -22,9 +23,22 @@ fuce:
   email_account: 1131095930@qq.com
   #发送邮箱登录密码
   email_password: xy1131095930.
+
+sms:
+  #用户名
+  username: smsadmin
+  #密钥id
+  secretId: AKID3e06wV6kJbfT1IrK7e17HBoJXoqfqYUq
+  #密钥
+  secretKey: NVNzK7dssb3gs2vXIeU4NccRZQ0M8diP
+  #sdkAppId
+  appId: 1400071138
+  #密钥
+  sign: 零度精灵
+  templateID: 90980
 #tomcat config
 server :
-  port : 8080
+  port : 8082
   ##项目名字配置
   #servlet :
   #  context-path : /demo
@@ -113,5 +127,6 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
+
 
 #  config-location: classpath:/mapper/mybatis-config.xml

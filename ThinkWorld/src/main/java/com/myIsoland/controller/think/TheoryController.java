@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.myIsoland.common.domain.AjaxResult;
 import com.myIsoland.common.file.FileUploadUtils;
+import com.myIsoland.constant.ProjectConstant;
 import com.myIsoland.constant.THINKConstant;
 import com.myIsoland.enitity.system.TsysUser;
 import com.myIsoland.enitity.think.Theory;
+import com.myIsoland.enums.CodeEnum;
+import com.myIsoland.service.system.TsysUserService;
 import com.myIsoland.service.think.TheoryService;
 import com.myIsoland.shiro.util.ShiroUtils;
 import com.myIsoland.util.SnowflakeIdWorker;
@@ -30,7 +33,8 @@ import java.io.IOException;
 public class TheoryController {
     @Autowired
     private TheoryService theoryService;
-
+    @Autowired
+    private TsysUserService tsysUserService;
     /**
      *@Author:THINKPAD
      *@Description:读取用户理论标题信息
@@ -49,7 +53,33 @@ public class TheoryController {
             //return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
         }
     }
+    /**
+     *@Author:THINKPAD
+     *@Description:读取用户理论标题信息
+     * @param
+     *@Return:java.lang.Object
+     *@Data:14:28 2020/1/4
+     **/
+    @GetMapping("/readUserTheoryByUserId")
+    public Object ReadUserTheoryByUserId(String userid){
+        userid = ProjectConstant.USERPREFIX+userid;
+        int i = tsysUserService.getById(userid).getThink();
+        if(i==1) {
+            return AjaxResult.success(theoryService.GetUserTheory(userid));
+        }else{
+            return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
+        }
+            //return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
+    }
 
+    @PostMapping("/modifyTheoryLockSts")
+    public Object ModifyTheoryLockSts(boolean lock){
+
+        theoryService.UpdateTheoryByUserId(lock?1:0,ShiroUtils.getUserId());
+
+        return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
+        //return AjaxResult.error(THINKConstant.SQL_EXCEPTION_CODE,e.getMessage());
+    }
   /*  @RequestMapping("/test")
     public Object test(HttpServletRequest request, RedirectAttributes redirectAttributes){
         MultipartHttpServletRequest req =(MultipartHttpServletRequest)request;

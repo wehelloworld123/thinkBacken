@@ -25,7 +25,7 @@ public interface UserTopicService extends IService<UserTopic> {
      *@Return:java.util.List<com.myIsoland.enitity.debate.Topic>
      *@Data:20:09 2020/1/27
      **/
-    List<Topic> GetUserAnsTopic(Date date);
+    List<Topic> GetUserAnsTopic(Date date,int startIndex,int pageSize);
 
     /**
      *@Author:THINKPAD
@@ -34,5 +34,5 @@ public interface UserTopicService extends IService<UserTopic> {
      *@Return:java.util.List<com.myIsoland.enitity.debate.UserTopic>
      *@Data:20:10 2020/1/27
      **/
-    List<UserTopic> GetUserRefBook();
+    List<UserTopic> GetUserRefBook(int startIndex,int pageSize);
 }

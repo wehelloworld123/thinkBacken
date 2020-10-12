@@ -2,14 +2,15 @@ package com.myIsoland.enums;
 
 public enum SexType {
     MALE(0),FEMALE(1);
-    private Integer value;
+    private int value;
 
-    SexType(Integer value){this.value=value;}
+    SexType(int value){this.value=value;}
 
-    public Integer getValue() {
+    public int getValue() {
         return value;
     }
-    public SexType valueOf(int value) {
+
+    public static SexType valueOf(int value) {
         switch (value) {
             case 0:
                 return SexType.MALE;

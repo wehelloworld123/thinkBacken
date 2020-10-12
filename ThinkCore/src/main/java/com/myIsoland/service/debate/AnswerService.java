@@ -2,19 +2,33 @@ package com.myIsoland.service.debate;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myIsoland.enitity.debate.Answer;
+import com.myIsoland.model.ResultSet;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface AnswerService extends IService<Answer> {
-    int AddAnsLikes(int ansId);
+    /**
+     * 删除点赞
+     * @param ansId
+     * @param userId
+     * @return
+     */
+    int delLikeSts(String ansId,String userId);
+    /**
+     * 点赞
+     * @param ansId
+     * @param userId
+     * @return
+     */
+    int addLikeSts(String ansId,String userId);
 
     List<Answer> GetLastThrCapter(String topicId);
 
-    List<Answer> GetNewAnsById(String topicId, Date date,int start);
+    List<Answer> GetAnswersByDate(String topicId, Date date, int start, int limit);
 
-    List<Answer> GetAdvanceAnsById(String topicId,Date date,int start);
+    List<Answer> GetAdvanceAnsByTopicId(String topicId,Date date,int likes,int recoms,int start,int limit);
 
     /**
      *@Author:THINKPAD
@@ -45,7 +59,7 @@ public interface AnswerService extends IService<Answer> {
      *@Return:com.myIsoland.enitity.debate.Answer
      *@Data:20:54 2020/1/26
      **/
-    Answer GetAnswerById(String no);
+    Answer GetAnswerById(String no,String userId);
 
     /**
      *@Author:THINKPAD

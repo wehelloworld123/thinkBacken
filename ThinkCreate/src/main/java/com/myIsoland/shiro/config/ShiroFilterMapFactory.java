@@ -43,15 +43,22 @@ user:例如/admins/user/**=user没有参数表示必须存在用户，当登入�
 		filterChainDefinitionMap.put("/logout", "logout");
 
 
-
-
-
+		filterChainDefinitionMap.put("/CreationDetail/**", "anon");
 		filterChainDefinitionMap.put("/LiterCreation/**", "anon");
 		filterChainDefinitionMap.put("/Home/**", "anon");
 		filterChainDefinitionMap.put("/Literature/**", "anon");
 		filterChainDefinitionMap.put("/LiterCreation/**", "anon");
+		filterChainDefinitionMap.put("/Poetry/**", "anon");
+		filterChainDefinitionMap.put("/PoemCreation/**", "anon");
+		filterChainDefinitionMap.put("/Comment/**", "anon");
+		filterChainDefinitionMap.put("/Recomment/**", "anon");
+		filterChainDefinitionMap.put("/Painting/**", "anon");
+		filterChainDefinitionMap.put("/UserAdoptCreation/**", "anon");
+		filterChainDefinitionMap.put("/UserInCreation/**", "anon");
+		filterChainDefinitionMap.put("/UserInvitPro/**", "anon");
+
 		//放验证码
-		filterChainDefinitionMap.put("/captcha/captchaImage**", "anon");
+		filterChainDefinitionMap.put("/captcha/**", "anon");
 		// 释放 druid 监控画面
 		filterChainDefinitionMap.put("/druid/**", "anon");
 		//释放websocket请求

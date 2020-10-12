@@ -1,18 +1,19 @@
 package com.myIsoland.shiro.service;
 
 
+import com.myIsoland.common.base.ThinkException;
+import com.myIsoland.common.component.RedisCacheService;
 import com.myIsoland.common.util.StringUtils;
 import com.myIsoland.enitity.system.TsysPermission;
 import com.myIsoland.enitity.system.TsysRole;
 import com.myIsoland.enitity.system.TsysUser;
+import com.myIsoland.enums.CodeEnum;
 import com.myIsoland.service.system.TsysPermissionService;
 import com.myIsoland.service.system.TsysRoleService;
 import com.myIsoland.service.system.TsysUserService;
+import com.myIsoland.shiro.config.UserPhoneToken;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 身份校验核心类
@@ -41,10 +43,10 @@ public class MyShiroRealm extends AuthorizingRealm {
 	private TsysUserService tsysUserService;
 	@Autowired
 	private TsysPermissionService tsysPermissionService;//权限dao
-
 	@Autowired
 	private TsysRoleService tsysRoleService;//角色dao
-
+	@Autowired
+	private RedisCacheService redisCacheService;
 
 
 
@@ -54,29 +56,60 @@ public class MyShiroRealm extends AuthorizingRealm {
 	@SuppressWarnings("unused")
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-		
-		 //加这一步的目的是在Post请求的时候会先进认证，然后在到请求
-        if (token.getPrincipal() == null) {
-            return null;
-        }
-		String username = (String) token.getPrincipal();
-		String password = new String((char[]) token.getCredentials());
-		// 通过username从数据库中查找 User对象，如果找到，没找到.
-		// 实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法
-		
-		TsysUser userInfo = tsysUserService.getUserByName(username);
-		
+		if(token instanceof UserPhoneToken) {
+			//加这一步的目的是在Post请求的时候会先进认证，然后在到请求
+			if (token.getPrincipal() == null) {
+				return null;
+			}
+			String username = (String) token.getPrincipal();
+			String verifyCode = new String((char[]) token.getCredentials());
+			// 通过username从数据库中查找 User对象，如果找到，没找到.
+			// 实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法
+
+			TsysUser userInfo = tsysUserService.getUserByName(username);
+
 //		System.out.println(userInfo);
 //		System.out.println("----->>userInfo=" + userInfo.getUsername() + "---"+ userInfo.getPassword());
-		if (userInfo == null)
-			return null;
-		else{
-			SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-					userInfo, // 用户名
-					userInfo.getPassword(), // 密码
-					getName() // realm name
-			);
-			return authenticationInfo;
+			if (userInfo == null) {
+				throw new ThinkException(CodeEnum.LOGIN_FAIL_CODE);
+			}
+			else {
+				//用户不为空则是缓存中取验证码，获取验证码后我将验证码存入了ehcache缓存，过期时间3分钟
+
+
+				SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+						userInfo, // 用户
+						username, // 密码
+						getName() // realm name
+				);
+				redisCacheService.delete(username+"_code");
+				return authenticationInfo;
+			}
+		}else{
+			//加这一步的目的是在Post请求的时候会先进认证，然后在到请求
+			if (token.getPrincipal() == null) {
+				return null;
+			}
+			String username = (String) token.getPrincipal();
+			String password = new String((char[]) token.getCredentials());
+			// 通过username从数据库中查找 User对象，如果找到，没找到.
+			// 实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法
+
+			TsysUser userInfo = tsysUserService.getUserByName(username);
+
+//		System.out.println(userInfo);
+//		System.out.println("----->>userInfo=" + userInfo.getUsername() + "---"+ userInfo.getPassword());
+			if (userInfo == null)
+				return null;
+			else {
+
+				SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+						userInfo, // 用户名
+						userInfo.getPassword(), // 密码
+						getName() // realm name
+				);
+				return authenticationInfo;
+			}
 		}
 		
 	}
@@ -115,7 +148,14 @@ public class MyShiroRealm extends AuthorizingRealm {
 		
 		return authorizationInfo;
 	}
-	
+	//Shiro令牌
+	public boolean supports(AuthenticationToken authenticationToken) {
+		//判断A 是否是B的父类
+		if(authenticationToken instanceof  UsernamePasswordToken){
+			return true;
+		}
+		return true;
+	}
 	 /**
      * 清理缓存权限
      */

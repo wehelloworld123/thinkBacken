@@ -4,6 +4,7 @@ package com.myIsoland.service.community;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myIsoland.common.config.MybatisRedisCache;
 import com.myIsoland.enitity.community.Comment;
+import com.myIsoland.model.ResultSet;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Options;
 
@@ -30,7 +31,7 @@ public interface CommentService extends IService<Comment> {
      *@Data:21:18 2019/11/20
      **/
     @Options(useCache = false)
-    List<Comment> GetCommentByDate(String userId,Long rootId, Date date,int start,int number);
+    ResultSet<Comment> GetCommentByDate(String userId,Long rootId, Date date,int start,int number);
     /**
     *@Author:THINKPAD
      *@Description:获取用户评论
@@ -42,7 +43,7 @@ public interface CommentService extends IService<Comment> {
     List<Comment> GetUserComment(String userId);
 
     @Options(timeout = 300)
-    Comment GetHotComment(String userId,Long rootId);
+    ResultSet<Comment> GetHotComment(String userId, Long rootId,int startIndex,int pageSize);
 
     int SaveComment(Comment data);
 

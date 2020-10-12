@@ -3,11 +3,15 @@ package com.myIsoland.service.product;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.constant.ProjectConstant;
 import com.myIsoland.enitity.product.LiterContent;
 import com.myIsoland.mapper.product.LiterContentMapper;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.shiro.util.ShiroUtils;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +40,15 @@ public class LiterContentServiceImpl extends ServiceImpl<LiterContentMapper,Lite
         userId = userId + ";";
         return this.baseMapper.updateLikeSts(userId,no);
     }
+    @Override
+    public int batchUpdateLikes(List<LiterContent> data) {
+        return this.baseMapper.batchUpdateLikeSts(data);
+    }
+    @Override
+    public int DelLikeSts(String userId, String no) {
+        userId = userId + ";";
+        return this.baseMapper.delLikeSts(userId,no);
+    }
 
 
     @Override
@@ -49,6 +62,7 @@ public class LiterContentServiceImpl extends ServiceImpl<LiterContentMapper,Lite
 
     @Override
     public List<LiterContent> GetUserLiterContent(String userId, int start) {
+
         return this.baseMapper.selectUserliterCont(userId,start);
     }
 
@@ -58,9 +72,10 @@ public class LiterContentServiceImpl extends ServiceImpl<LiterContentMapper,Lite
     }
 
     @Override
-    public List<LiterContent> GetHotContent(String userId,Long charpId) {
+    public List<LiterContent> GetHotContent(Long charpId) {
         QueryWrapper<LiterContent> wrapper = new QueryWrapper<>();
-        wrapper.select("no","title","summary","likes","recom_no","adopt","create_by","create_dat","instr(favorer,"+userId+") as is_like")
+        /*wrapper.select("no","title","summary","likes","recom_no","adopt","create_by","create_dat","instr(favorer,"+userId+") as is_like")*/
+        wrapper.select("no","title","summary","likes","recom_no","adopt","create_by","create_dat")
                 .lambda().eq(LiterContent::getCharpId,charpId)
                 .ge(LiterContent::getRecomNo,40)
                 .ge(LiterContent::getLikes,100)
@@ -72,22 +87,44 @@ public class LiterContentServiceImpl extends ServiceImpl<LiterContentMapper,Lite
     }
 
     @Override
-    public List<LiterContent> GetContentsOrderByDate(String userId,Long charpId, Date date, List<String> arr) {
+    public ResultSet<LiterContent> GetContentsOrderByDate(Long charpId, Date date,int start,int limit, List<String> arr) {
+        PageHelper.offsetPage(start,limit,true);
         QueryWrapper<LiterContent> wrapper = new QueryWrapper<>();
-        wrapper.select("no","title","summary","likes","recom_no","adopt","create_by","create_dat","instr(favorer,"+userId+") as is_like")
+        wrapper.select("no","title","summary","likes","recom_no","adopt","create_by","create_dat")
                 .lambda()
                 .eq(LiterContent::getCharpId,charpId)
                 .lt(LiterContent::getCreateDat,date)
                 .eq(LiterContent::getIsDel,0)
                 .notIn(LiterContent::getNo,arr)
-                .orderByDesc(LiterContent::getCreateDat)
-                .last("LIMIT 15");
-        return this.baseMapper.selectList(wrapper);
+                .orderByDesc(LiterContent::getCreateDat);
+        List<LiterContent> list = this.baseMapper.selectList(wrapper);
+        PageInfo<LiterContent> pageInfo = new PageInfo<>(list);
+        ResultSet<LiterContent> resultSet = new ResultSet<>();
+        resultSet.setCount(pageInfo.getTotal());
+        resultSet.setList(list);
+        return resultSet;
+    }
+    @Override
+    public ResultSet<LiterContent> GetContentsOrderByFavors(Long charpId, int likes,int start,int limit) {
+        PageHelper.offsetPage(start,limit,true);
+        QueryWrapper<LiterContent> wrapper = new QueryWrapper<>();
+        wrapper.select("no","title","summary","likes","recom_no","adopt","create_by","create_dat")
+                .lambda()
+                .eq(LiterContent::getCharpId,charpId)
+                .ge(LiterContent::getLikes,likes)
+                .eq(LiterContent::getIsDel,0)
+                .orderByDesc(LiterContent::getCreateDat);
+        List<LiterContent> list = this.baseMapper.selectList(wrapper);
+        PageInfo<LiterContent> pageInfo = new PageInfo<>(list);
+        ResultSet<LiterContent> resultSet = new ResultSet<>();
+        resultSet.setCount(pageInfo.getTotal());
+        resultSet.setList(list);
+        return resultSet;
     }
 
     @Override
-    public LiterContent GetLiterContentDetail(String no) {
-        return this.baseMapper.selectLiterContentRecom(ProjectConstant.CLITERPREFIX + no);
+    public LiterContent GetLiterContentDetail(String userid,String no) {
+        return this.baseMapper.selectLiterContentRecom(userid,no);
     }
 
     @Override
@@ -116,8 +153,34 @@ public class LiterContentServiceImpl extends ServiceImpl<LiterContentMapper,Lite
     }
 
     @Override
-    public List<LiterContent> GetUserLiterContentByDate(String userId, Date date,int page) {
-        return this.baseMapper.selectUserLiterContentByDate(userId,date,page);
+    public ResultSet<LiterContent> GetUserLiterContentByDate(String userId, Date date,int start,int limit) {
+        PageHelper.offsetPage(start,limit,true);
+        QueryWrapper<LiterContent> wrapper = new QueryWrapper<>();
+        wrapper.select("no","title","substring(content,1,200) as content","charp_id as charpId","charp_name as charpName","sec_name as secName","create_dat as createDat")
+                .lambda().eq(LiterContent::getCreateBy,userId)
+                .le(LiterContent::getCreateDat,date)
+                .eq(LiterContent::getIsDel,0)
+                .orderByDesc(LiterContent::getCreateDat);
+        List<LiterContent> list = this.baseMapper.selectList(wrapper);
+        PageInfo<LiterContent> pageInfo = new PageInfo<>(list);
+        ResultSet<LiterContent> resultSet = new ResultSet<>();
+        resultSet.setList(list);
+        resultSet.setCount(pageInfo.getTotal());
+        return  resultSet;
+    }
+
+    @Override
+    public List<LiterContent> GetSysRecomLiterContent(Date startDate, Date endDate, int startIndex, int pageSize) {
+        QueryWrapper<LiterContent> wrapper = new QueryWrapper<>();
+        wrapper.select("no","title","substring(content,1,200) as content","charp_id as charpId","likes","creator","create_dat as createDat")
+                .lambda()
+                .le(BaseEntity::getCreateDat,endDate)
+                .ge(BaseEntity::getCreateDat,startDate)
+                .le(BaseEntity::getIsDel,0)
+                .orderByDesc(LiterContent::getLikes)
+                .last("limit "+startIndex+","+pageSize);
+        return this.baseMapper.selectList(wrapper);
+
     }
 
 

@@ -10,19 +10,15 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.mapping.FetchType;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TopicMapper extends BaseMapper<Topic> {
-    @Select("SELECT an.creator,an.creator_avat,an.create_by " +
+    @Select("SELECT t.uid as uid, t.subject as subject,an.no as no,an.creator as creator,an.creator_avat as creatorAvat,an.create_by as createBy" +
             "FROM t_deb_answer as an LEFT JOIN  t_deb_topic as t " +
             "ON t.year=#{year} AND t.times=#{times} " +
             "WHERE an.topic_id=t.uid AND an.is_del=0 " +
             "ORDER BY an.grade+0,an.create_dat DESC")
-    @Results(id = "user",value = {
-            @Result(property = "userName",column = "creator"),
-            @Result(property = "userId",column = "create_by"),
-            @Result(property = "userAvat",column = "creator_avat")
-    })
-    List<UserInfo> queryThreeAns(String year,int times);
+    List<Map<String,Object>> queryThreeAns(String year, int times);
 
     @Select("SELECT uid,title,content,view,belong_nam,year,time " +
             "FROM t_deb_topic " +

@@ -2,7 +2,10 @@ package com.myIsoland.service.think;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myIsoland.enitity.think.Quotation;
+import com.myIsoland.model.ResultSet;
 
+
+import java.util.Date;
 import java.util.List;
 
 public interface QuotationService extends IService<Quotation> {
@@ -24,9 +27,17 @@ public interface QuotationService extends IService<Quotation> {
      *@Return:java.util.List<com.myIsoland.enitity.think.Quotation>
      *@Data:20:02 2019/12/29
      **/
-    List<Quotation> GetUserQuotation(String userId,String theoryNo);
+    ResultSet<Quotation> GetUserQuotation(String userId, String theoryNo, Date date, int start, int limit);
 
-
+    /**
+     *@Author:THINKPAD
+     *@Description:用户查看另一用户理论语录数据
+     * @param userId
+     * @param theoryNo
+     *@Return:java.util.List<com.myIsoland.enitity.think.Quotation>
+     *@Data:20:02 2019/12/29
+     **/
+    List<Quotation> GetQuotationByUserId(String userId, String theoryNo, Date date, int start, int limit);
 
     /**
      *@Author:THINKPAD

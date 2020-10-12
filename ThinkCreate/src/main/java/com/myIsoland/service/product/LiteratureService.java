@@ -5,9 +5,11 @@ import com.myIsoland.common.config.MybatisRedisCache;
 import com.myIsoland.enitity.product.Literature;
 import com.myIsoland.enums.CreateKind;
 import com.myIsoland.model.LiteratureModel;
+import com.myIsoland.model.ResultSet;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Options;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +20,17 @@ public interface LiteratureService extends IService<Literature> {
 
     int UpdateLiterature(Literature data);
 
-
-    List<Literature> GetLiteratureByType(CreateKind kind,int partner,int views);
+    /**
+     * 根据类型获取作品列表
+     * @param kind
+     * @param partner
+     * @param views
+     * @param limit
+     * @return
+     */
+    List<Literature> GetLiteratureByType(CreateKind kind,int partner,int views,int limit);
     @Options(timeout = 600)
-    List<Literature> GetInitLiterByType(CreateKind kind,int partner,int views);
+    List<Literature> GetInitLiterByType(CreateKind kind,int partner,int views,int limit);
 
     Literature GetLiteratureById(String uid);
     @Options(timeout = 3600)
@@ -29,4 +38,39 @@ public interface LiteratureService extends IService<Literature> {
 
     List<Literature> GetHotIpLiteratures(int partner,int views);
 
+    List<Literature>  GetLiteratures(int start, int limit);
+
+    /**
+     * 获取系统推荐的构思作品
+     * @param date
+     * @return
+     */
+    @Options(timeout = 3600)
+    Literature GetSysRecomOnThinPro(Date date);
+
+
+    /**
+     * 获取系统推荐的热门Ip作品
+     * @param date
+     * @param startIndex
+     * @param pageSize
+     * @return
+     */
+    @Options(timeout = 3600)
+    List<Literature> GetSysRecomIpPro(Date date,int startIndex,int pageSize);
+
+    /**
+     * 通过关键词查询书籍信息，通过ela
+     * @param key
+     * @param startIndex
+     * @param pageSize
+     * @return
+     */
+    List<Literature> QueryLiteratureByKey(String key,int startIndex,int pageSize);
+
+    /**
+     * 获取专题作品列表
+     * @return
+     */
+    ResultSet<Map<String,Object>> GetSubjectBookList(Date date,String source,int startIndex,int pageSize);
 }

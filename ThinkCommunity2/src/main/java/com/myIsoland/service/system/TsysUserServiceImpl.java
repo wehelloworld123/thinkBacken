@@ -12,12 +12,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TsysUserServiceImpl extends ServiceImpl<TsysUserMapper,TsysUser> implements TsysUserService{
-    @Autowired
-    private TsysUserMapper tsysUserMapper;
+
     @DataSource(DataSourceEnum.DB1)
     @Override
     public TsysUser getUserByName(String username){
-        return tsysUserMapper.queryUserByName(username);
+        return this.baseMapper.queryUserByName(username);
     }
 
 }

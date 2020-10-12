@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SpringbootStart {
 ;
 	public static void main(String[] args) {
+		System.setProperty("es.set.netty.runtime.available.processors", "false");
 		SpringApplication.run(SpringbootStart.class, args);
 	}
 

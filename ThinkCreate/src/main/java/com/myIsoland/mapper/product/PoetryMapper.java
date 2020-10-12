@@ -8,14 +8,18 @@ import org.apache.ibatis.mapping.FetchType;
 import java.util.List;
 
 public interface PoetryMapper extends BaseMapper<Poetry> {
-    @Select("SELECT uid,seter,name,cover,topic,purpose,describe,kind,partner,views,create_dat " +
+    @Select("SELECT uid,seter,name,cover,topic,purpose,description,kind,partner,views,create_dat " +
             "FROM t_pro_poetry " +
-            "WHERE partner <= #{partner} " +
-            "OR views <= #{views} " +
+            "WHERE kind = #{kind} " +
+            "AND partner < #{partner} " +
+            "OR ( " +
+            "partner = #{partner} " +
+            "AND views < #{views}" +
+            ") " +
             "AND finish = 0 " +
             "AND is_del = 0 " +
             "ORDER BY partner,views DESC " +
-            "LIMIT 15 ")
+            "LIMIT #{limit} ")
     @Results({
             @Result(column = "uid",property = "uid"),
             @Result(column = "seter",property = "seter"),
@@ -23,15 +27,41 @@ public interface PoetryMapper extends BaseMapper<Poetry> {
             @Result(column = "cover",property = "cover"),
             @Result(column = "topic",property = "topic"),
             @Result(column = "purpose",property = "purpose"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "kind",property = "kind"),
             @Result(column = "partner",property = "partner"),
             @Result(column = "views",property = "views"),
-            @Result(column = "create_dat",property = "createDat"),
-            @Result(property = "charpt",column = "uid",one = @One(select="com.myIsoland.mapper.product.PoemSetMapper.selectSetByUid",fetchType = FetchType.EAGER))
+            @Result(column = "create_dat",property = "createDat")
+         /*   @Result(property = "charpt",column = "uid",one = @One(select="com.myIsoland.mapper.product.PoemSetMapper.selectSetByUid",fetchType = FetchType.EAGER))*/
     })
-    List<Poetry> selectHotLiters(@Param("kind")int kind, @Param("partner")int partner, @Param("views")int views);
+    List<Poetry> selectHotLiters(@Param("kind")String kind, @Param("partner")int partner, @Param("views")int views,@Param("limit") int limit);
 
+
+    @Select("SELECT uid,seter,name,cover,topic,purpose,description,kind,partner,views,create_dat " +
+            "FROM t_pro_poetry " +
+            "WHERE partner < #{partner} " +
+            "OR ( " +
+            "partner = #{partner} " +
+            "AND views < #{views}" +
+            ") " +
+            "AND finish = 0 " +
+            "AND is_del = 0 " +
+            "ORDER BY partner,views DESC " +
+            "LIMIT #{limit} ")
+    @Results({
+            @Result(column = "uid",property = "uid"),
+            @Result(column = "seter",property = "seter"),
+            @Result(column = "name",property = "name"),
+            @Result(column = "cover",property = "cover"),
+            @Result(column = "topic",property = "topic"),
+            @Result(column = "purpose",property = "purpose"),
+            @Result(column = "description",property = "description"),
+            @Result(column = "kind",property = "kind"),
+            @Result(column = "partner",property = "partner"),
+            @Result(column = "views",property = "views"),
+            @Result(column = "create_dat",property = "createDat")
+    })
+    List<Poetry> selectInitHotLiters(@Param("partner")int partner, @Param("views")int views,@Param("limit") int limit);
 
     @Select("SELECT uid,seter,name,cover,topic,purpose,kind,charpter,section,fin_charpt,fin_section,deadline,create_dat,publisher,finish " +
             "FROM t_pro_poetry " +

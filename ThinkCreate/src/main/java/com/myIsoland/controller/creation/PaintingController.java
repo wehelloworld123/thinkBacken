@@ -2,10 +2,12 @@ package com.myIsoland.controller.creation;
 
 import com.myIsoland.common.domain.AjaxResult;
 import com.myIsoland.common.util.CaculateUtils;
+import com.myIsoland.common.util.DateUtils;
 import com.myIsoland.constant.ProjectConstant;
 import com.myIsoland.enitity.product.Literature;
 import com.myIsoland.enitity.product.Painting;
 import com.myIsoland.enitity.product.PaintingPart;
+import com.myIsoland.enums.CreateEnum;
 import com.myIsoland.enums.CreateKind;
 import com.myIsoland.enums.RecomType;
 import com.myIsoland.service.product.PaintingPartService;
@@ -38,45 +40,32 @@ public class PaintingController {
 
     /**
      *@Author:THINKPAD
-     *@Description:读取艺术绘画初始化页面
-     * @param kind
-     * @param partner
-     * @param views
-     *@Return:java.lang.Object
-     *@Data:14:32 2020/1/31
-     **/
-    @GetMapping("/readInitPainting")
-    public Object ReadInitPainting(int kind, int partner, int views){
-        Map<String,Object> data = new HashMap<>();
-
-       List<Painting> paintings = paintingService.GetPaintingByType(CreateKind.valueOf(kind),partner,views);
-       Painting painting = paintingService.GetTopPainting();
-
-       data.put("paintings",paintings);
-       data.put("painting",painting);
-
-       return AjaxResult.success(data);
-
-    }
-
-    /**
-     *@Author:THINKPAD
      *@Description:读取艺术绘画信息
      * @param kind
-     * @param partner
-     * @param views
+     * @param partner
+     * @param views
+     * @param limit
      *@Return:java.lang.Object
      *@Data:14:41 2020/1/31
      **/
     @GetMapping("/readPaintings")
-    public Object ReadPaintings(int kind, int partner, int views){
-        Map<String,Object> data = new HashMap<>();
+    public Object ReadPaintings(String kind, int partner, int views,int start,int limit){
+        return AjaxResult.success(paintingService.GetPaintingByType(CreateEnum.valueOf(kind),partner,views,start,limit));
+    }
 
-        List<Painting> paintings = paintingService.GetPaintingByType(CreateKind.valueOf(kind),partner,views);
-        data.put("paintings",paintings);
-
-        return AjaxResult.success(data);
-
+    /**
+     *@Author:THINKPAD
+     *@Description:读取新发布艺术绘画信息
+     * @param date
+     * @param kind
+     * @param start
+     * @param limit
+     *@Return:java.lang.Object
+     *@Data:14:41 2020/1/31
+     **/
+    @GetMapping("/readNewPubPaintings")
+    public Object ReadNewPubPaintings(String date, int kind, int start,int limit){
+        return AjaxResult.success(paintingService.GetPaintingByDate(CreateEnum.valueOf(kind+""), DateUtils.parseDate(date),start,limit));
     }
 
     /**
@@ -91,7 +80,7 @@ public class PaintingController {
         Map<String,Object> data = new HashMap<>();
         paintId = ProjectConstant.PAINTINGPREFIX + paintId;
         Painting painting= paintingService.GetPaintingById(paintId);
-        List<Map<String,Object>> partner = userCreationService.GetCreatPartInfo(paintId, RecomType.PAINTING);
+        List<Map<String,Object>> partner = userCreationService.GetCreatPartInfo(paintId, RecomType.PAINTING,0,20);
         data.put("painting", CaculateUtils.deletePrefix(painting));
         data.put("partner",partner);
         return AjaxResult.success(data);
@@ -99,16 +88,55 @@ public class PaintingController {
 
     /**
      *@Author:THINKPAD
+     *@Description:读取绘画作品详情
+     * @param uid
+     *@Return:java.lang.Object
+     *@Data:21:33 2020/1/29
+     **/
+    @GetMapping("/readPainting")
+    public Object ReadPainting(String uid){
+        uid = ProjectConstant.PAINTINGPREFIX + uid;
+        Painting painting= paintingService.GetPaintingById(uid);
+        return AjaxResult.success(painting);
+    }
+
+    @GetMapping("/readPaintingCreators")
+    public Object ReadPaintingCreators(String paintId){
+        List<Map<String,Object>> partner = userCreationService.GetCreatPartInfo(paintId, RecomType.PAINTING,0,20);
+        return AjaxResult.success(partner);
+    }
+
+    /**
+     *@Author:THINKPAD
      *@Description:获取绘画部分信息
-     * @param paintId
+     * @param id
      *@Return:java.lang.Object
      *@Data:22:18 2020/1/29
      **/
     @GetMapping("/readPaintingParts")
-    public Object ReadPaintingParts(String paintId){
-        paintId = ProjectConstant.PAINTINGPREFIX + paintId;
-        List<PaintingPart>  parts= paintingPartService.GetPaintingPartByPaintId(paintId);
+    public Object ReadPaintingParts(String id){
+        id = ProjectConstant.PAINTINGPREFIX + id;
+        List<PaintingPart>  parts= paintingPartService.GetPaintingPartByPaintId(id);
         return AjaxResult.success(parts);
     }
-
+    /**
+     *@Author:THINKPAD
+     *@Description:搜索绘画或者章节信息
+     * @param keyword
+     * @param startIndex
+     * @param pageSize
+     * @param type
+     *@Return:java.lang.Object
+     *@Data:22:18 2020/1/29
+     **/
+    @GetMapping("/search")
+    public Object Search(String keyword,int startIndex,int pageSize,int type){
+        if(type==0) {
+            List<Painting> list = paintingService.QueryPaintingByKey(keyword, startIndex, pageSize);
+            return AjaxResult.success(CaculateUtils.deletePaintingPrefix(list));
+        }else {
+            List<PaintingPart> list = paintingPartService.QueryPaintingPartByKey(keyword,startIndex,pageSize);
+            return AjaxResult.success(CaculateUtils.deletePartsPrefix(list));
+        }
+    }
 }

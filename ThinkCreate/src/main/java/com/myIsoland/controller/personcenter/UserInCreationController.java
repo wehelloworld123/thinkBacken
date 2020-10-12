@@ -8,6 +8,7 @@ import com.myIsoland.enitity.product.PaintContent;
 import com.myIsoland.enitity.product.PoemContent;
 import com.myIsoland.enums.CodeEnum;
 import com.myIsoland.enums.RecomType;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.service.product.LiterContentService;
 import com.myIsoland.service.product.PaintContentService;
 import com.myIsoland.service.product.PoemContentService;
@@ -35,44 +36,44 @@ public class UserInCreationController {
     private PaintContentService paintContentService;
 
     @GetMapping("/readUserCreations")
-    public Object ReadUserCreations(int type,String date,int page){
-        Map<String,Object> data = new HashMap<>();
+    public Object ReadUserCreations(int type,String date,int start,int limit){
         String userId = ShiroUtils.getUserId();
         if(RecomType.valueOf(type).equals(RecomType.LITERATURE)){
-            LiterContent creation = literContentService.GetUserAdvanceLiterContent(userId,100,300);
-            List<LiterContent> creations = literContentService.GetUserLiterContentByDate(userId, DateUtils.parseDate(data),page);
-            data.put("creation",creation);
-            data.put("creations",creations);
+           // LiterContent creation = literContentService.GetUserAdvanceLiterContent(userId,100,300);
+            ResultSet<LiterContent> resultSet = literContentService.GetUserLiterContentByDate(userId, DateUtils.parseDate(date),start,limit);
+           // data.put("creation",creation);
+            return AjaxResult.success(resultSet);
         }else if(RecomType.valueOf(type).equals(RecomType.PAINTING)){
-            PaintContent creation = paintContentService.GetUserAdvancePaintContent(userId,100,300);
-            List<PaintContent> creations = paintContentService.GetUserPaintContentByDate(userId, DateUtils.parseDate(data),page);
-            data.put("creation",creation);
-            data.put("creations",creations);
+         //   PaintContent creation = paintContentService.GetUserAdvancePaintContent(userId,100,300);
+            ResultSet<PaintContent> resultSet = paintContentService.GetUserPaintContentByDate(userId, DateUtils.parseDate(date),start,limit);
+         //   data.put("creation",creation);
+            return AjaxResult.success(resultSet);
         }else  if(RecomType.valueOf(type).equals(RecomType.POEMTY)){
-            PoemContent creation = poemContentService.GetUserAdvancePoemContent(userId,100,300);
-            List<PoemContent> creations = poemContentService.GetUserPoemContentByDate(userId, DateUtils.parseDate(data),page);
-            data.put("creation",creation);
-            data.put("creations",creations);
+           // PoemContent creation = poemContentService.GetUserAdvancePoemContent(userId,100,300);
+            ResultSet<PoemContent> resultSet = poemContentService.GetUserPoemContentByDate(userId, DateUtils.parseDate(date),start,limit);
+          //  data.put("creation",creation);
+            return AjaxResult.success(resultSet);
+        }else {
+            return AjaxResult.error(CodeEnum.INCORRECT_REQ_PARAM.getCode(),CodeEnum.INCORRECT_REQ_PARAM.getMessage(),null);
         }
-        return AjaxResult.success(data);
     }
 
-    @GetMapping("/readNextUserCreations")
-    public Object ReadNextUserCreations(int type,String date,int page){
+/*    @GetMapping("/readNextUserCreations")
+    public Object ReadNextUserCreations(int type,String date,int page,int start,int limit){
         Map<String,Object> data = new HashMap<>();
         String userId = ShiroUtils.getUserId();
         if(RecomType.valueOf(type).equals(RecomType.LITERATURE)){
-            List<LiterContent> creations = literContentService.GetUserLiterContentByDate(userId, DateUtils.parseDate(data),page);
+            List<LiterContent> creations = literContentService.GetUserLiterContentByDate(userId, DateUtils.parseDate(date),page);
             data.put("creations",creations);
         }else if(RecomType.valueOf(type).equals(RecomType.PAINTING)){
-            List<PaintContent> creations = paintContentService.GetUserPaintContentByDate(userId, DateUtils.parseDate(data),page);
+            List<PaintContent> creations = paintContentService.GetUserPaintContentByDate(userId, DateUtils.parseDate(date),page);
             data.put("creations",creations);
         }else  if(RecomType.valueOf(type).equals(RecomType.POEMTY)){
-            List<PoemContent> creations = poemContentService.GetUserPoemContentByDate(userId, DateUtils.parseDate(data),page);
+            List<PoemContent> creations = poemContentService.GetUserPoemContentByDate(userId, DateUtils.parseDate(date),page);
             data.put("creations",creations);
         }
         return AjaxResult.success(data);
-    }
+    }*/
 
     @GetMapping("/delUserCreations")
     public Object DelUserCreations(int type,String no){

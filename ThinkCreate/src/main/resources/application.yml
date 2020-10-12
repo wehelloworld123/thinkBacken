@@ -44,7 +44,10 @@ spring :
 #        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 #        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategy
 #    show-sql: true
-
+  data:
+    elasticsearch:
+      cluster-name: elasticsearch
+      cluster-nodes: 127.0.0.1:9300
   # Redis------------------------
   redis:
     database: 0
@@ -100,5 +103,8 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
+
+
+
 
 #  config-location: classpath:/mapper/mybatis-config.xml

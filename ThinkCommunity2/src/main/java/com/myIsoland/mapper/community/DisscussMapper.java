@@ -47,13 +47,12 @@ public interface DisscussMapper extends BaseMapper<Disscuss> {
 
     @Select("SELECT  d.id as id,d.content as content,d.pic as pic,d.location as location,d.label as label,d.likes as likes,instr(d.favorer,#{userId}) as is_like,#{userId} as userId, " +
             "d.comment_no as comment_no,u.username as creator,u.sex as creator_sex,u.avatar as creator_avat,d.create_dat as create_dat,d.l_update_dat as l_update_dat  " +
-            "FROM t_com_discuss d INNER JOIN t_sys_user u " +
-            "ON d.create_by = u.id " +
-            "AND d.create_dat <= #{date} " +
-            "AND u.is_del = 0 " +
+            "FROM t_com_discuss d left JOIN t_sys_user u " +
+            "ON d.create_dat <= #{date} " +
             "AND d.is_del = 0 " +
-            "ORDER BY create_dat DESC " +
-            "LIMIT #{start},#{number} ")
+            "WHERE d.create_by = u.id "+
+            "AND u.is_del = 0 " +
+            "ORDER BY d.create_dat DESC " )
     @Results(value =
             {
                     @Result(property = "id",column = "id"),
@@ -72,7 +71,7 @@ public interface DisscussMapper extends BaseMapper<Disscuss> {
                     @Result(property = "createDat",column = "create_dat"),
                     @Result(property = "lUpdateDat",column = "l_update_dat")
             })
-    List<Disscuss> queryNewDiscussOrderByDate(@Param("userId") String userId,@Param("date") Date date,@Param("start")int start,@Param("number") int number);
+    List<Disscuss> queryNewDiscussOrderByDate(@Param("userId") String userId,@Param("date") Date date);
 
 
     /**

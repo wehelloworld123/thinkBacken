@@ -8,7 +8,7 @@ import org.apache.ibatis.mapping.FetchType;
 import java.util.List;
 
 public interface PaintingMapper extends BaseMapper<Painting> {
-    @Select("SELECT uid,seter,name,cover,topic,purpose,describe,kind,is_top,create_dat " +
+    @Select("SELECT uid,seter,name,cover,topic,purpose,description,kind,is_top,create_dat " +
             "FROM t_pro_paint " +
             "WHERE kind = #{kind} AND finish = 0 AND is_del =0 " +
             "ORDER BY is_top,create_dat DESC  LIMIT #{start},20")
@@ -19,7 +19,7 @@ public interface PaintingMapper extends BaseMapper<Painting> {
             @Result(column = "cover",property = "cover"),
             @Result(column = "topic",property = "topic"),
             @Result(column = "purpose",property = "purpose"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "kind",property = "kind"),
             @Result(column = "is_top",property = "isTop"),
             @Result(column = "create_dat",property = "createDat")
@@ -27,13 +27,18 @@ public interface PaintingMapper extends BaseMapper<Painting> {
     List<Painting> selectHotLiters(@Param("kind") int kind, @Param("start") int start);
 
 
-    @Select("SELECT uid,seter,name,cover,topic,purpose,describe,kind,partner,views,is_top,create_dat " +
+    @Select("SELECT uid,seter,name,cover,topic,purpose,description,kind,partner,views,is_top,create_dat " +
             "FROM t_pro_paint " +
-            "WHERE partner <= #{partner} " +
+            "WHERE kind = #{kind} " +
+            "AND partner < #{partner} " +
+            "OR( " +
+            "partner = #{partner} " +
+            "AND views < #{views} " +
+            ") " +
             "AND finish = 0 " +
             "AND is_del = 0 " +
-            "ORDER BY partner,views DESC " +
-            "LIMIT 15 ")
+            "ORDER BY partner DESC,views DESC " +
+            "LIMIT #{start},#{limit} ")
     @Results({
             @Result(column = "uid",property = "uid"),
             @Result(column = "seter",property = "seter"),
@@ -41,7 +46,7 @@ public interface PaintingMapper extends BaseMapper<Painting> {
             @Result(column = "cover",property = "cover"),
             @Result(column = "topic",property = "topic"),
             @Result(column = "purpose",property = "purpose"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "kind",property = "kind"),
             @Result(column = "partner",property = "partner"),
             @Result(column = "views",property = "views"),
@@ -49,7 +54,7 @@ public interface PaintingMapper extends BaseMapper<Painting> {
             @Result(column = "create_dat",property = "createDat"),
             @Result(property = "part",column = "uid",one = @One(select="com.myIsoland.mapper.product.PaintingPartMapper.selectPaintingPartByUid",fetchType = FetchType.EAGER))
     })
-    List<Painting> selectPaintByType(@Param("kind")int kind,@Param("partner")int partner,@Param("views")int views);
+    List<Painting> selectPaintByType(@Param("kind")String kind,@Param("partner")int partner,@Param("views")int views,@Param("start") int start,@Param("limit") int limit);
 
 
     @Select("SELECT uid,seter,name,cover,topic,purpose,kind,part,section,fin_part,fin_section,deadline,create_dat,publisher,finish " +

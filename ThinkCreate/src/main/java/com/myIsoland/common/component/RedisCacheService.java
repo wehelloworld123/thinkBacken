@@ -2,6 +2,7 @@ package com.myIsoland.common.component;
 
 import com.myIsoland.enums.CodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -37,6 +38,69 @@ public class RedisCacheService {
         }
     }
 
+
+    /**
+     * 有序表范围有数限制查询
+     * @param key
+     * @param range
+     * @param limit
+     * @return Set<Object>
+     * @author xy
+     * @date 22020年1月14日
+     */
+    public Set<Object> zsetRangeByLex (String key, RedisZSetCommands.Range range, RedisZSetCommands.Limit limit) {
+        try {
+            return redisTemplate.opsForZSet().rangeByLex(key,range,limit);
+        } catch (Exception e) {
+
+            throw e;
+        }
+    }
+    /**
+     * 有序表范围有数限制查询
+     * @param key
+     * @param range
+     * @return Set<Object>
+     * @author xy
+     * @date 22020年1月14日
+     */
+    public Set<Object> zsetRangeByLex (String key, RedisZSetCommands.Range range) {
+        try {
+            return redisTemplate.opsForZSet().rangeByLex(key,range);
+        } catch (Exception e) {
+            throw new ThinkRPCException(CodeEnum.REDIS_EXCEPTION);
+        }
+    }
+    /**
+     * 有序表单个成员添加
+     * @param key,field
+     * @return Boolean
+     * @author xy
+     * @date 22020年1月14日
+     */
+    public Boolean addSingleZset (String key,String value,double v) {
+        try {
+            return redisTemplate.opsForZSet().add(key,value,v);
+        } catch (Exception e) {
+            throw new ThinkRPCException(CodeEnum.REDIS_EXCEPTION);
+        }
+    }
+
+    /**
+     * 有序表列表成员添加
+     * @param key
+     * @param tuples
+     * @return Boolean
+     * @author xy
+     * @date 22020年1月14日
+     */
+    public Long addBatchZset (String key,Set<ZSetOperations.TypedTuple<Object>> tuples) {
+        try {
+            return redisTemplate.opsForZSet().add(key,tuples);
+        } catch (Exception e) {
+            throw new ThinkRPCException(CodeEnum.REDIS_EXCEPTION);
+        }
+    }
     /**
      * 有序表成员自增
      * @param key,field

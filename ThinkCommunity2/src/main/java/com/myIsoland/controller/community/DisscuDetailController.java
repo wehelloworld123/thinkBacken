@@ -7,6 +7,7 @@ import com.myIsoland.enitity.community.UserConcern;
 import com.myIsoland.enitity.system.TsysUser;
 import com.myIsoland.enums.CodeEnum;
 import com.myIsoland.enums.SexType;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.service.community.CommentService;
 import com.myIsoland.service.community.DisscussService;
 import com.myIsoland.service.community.UserConcernService;
@@ -66,15 +67,19 @@ public class DisscuDetailController {
      *@Data:15:55 2020/2/9
      **/
     @GetMapping("/readCommentsOrderDat")
-    public Object ReadCommentsOrderDat(Long id,String date,int page,int type){
+    public Object ReadCommentsOrderDat(Long id,String date,int startIndex,int pageSize,int type){
         Map<String,Object> data = new  HashMap<>();
         String userId = ShiroUtils.getUserId();
         if(type==0) {
-            Comment comment = commentService.GetHotComment(userId, id);
-            data.put("comment",comment);
+            ResultSet<Comment> resultSet = commentService.GetHotComment(userId, id,startIndex,1);
+            if(resultSet.getList()!=null&&resultSet.getList().size()>0) {
+                data.put("comment", resultSet.getList().get(0));
+            }else{
+                data.put("comment", null);
+            }
         }
-        List<Comment> comments = commentService.GetCommentByDate(userId,id, DateUtil.parseDateTime(date),page,40);
-        data.put("comments",comments);
+        ResultSet<Comment> resultSet = commentService.GetCommentByDate(userId,id, DateUtil.parseDateTime(date),startIndex,pageSize);
+        data.put("comments",resultSet);
         return AjaxResult.success(data);
     }
 

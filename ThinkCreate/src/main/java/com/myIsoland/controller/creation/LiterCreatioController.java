@@ -11,6 +11,7 @@ import com.myIsoland.constant.THINKConstant;
 import com.myIsoland.enitity.product.LiterCharpt;
 import com.myIsoland.enitity.product.LiterContent;
 import com.myIsoland.enums.CodeEnum;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.service.product.LiterCharpService;
 import com.myIsoland.service.product.LiterCharpServiceImpl;
 import com.myIsoland.service.product.LiterContentService;
@@ -42,25 +43,22 @@ public class LiterCreatioController {
      *@Data:16:43 2020/1/30
      **/
     @GetMapping("/readLiteraturePro")
-    public Object ReadLiteraturePro(Long charptId, String date){
+    public Object ReadLiteraturePro(Long charptId){
         Map<String,Object> data = new HashMap<>();
-        String userId = ShiroUtils.getUserId();
         LiterCharpt charpt = literCharpService.GetCharptDetail(charptId);
-        LiterContent content;
-        List<LiterContent> creations = null;
         List<String> arr = new LinkedList<>();
         if(charpt.getFinish()==1){
-            content = literContentService.GetAdoptContent(charptId);
-            data.put("content",CaculateUtils.deletePrefix(content));
+            LiterContent content = literContentService.GetAdoptContent(charptId);
+            data.put("creation",CaculateUtils.deletePrefix(content));
         }else {
-            creations = literContentService.GetHotContent(userId,charptId);
+            List<LiterContent>  creations = literContentService.GetHotContent(charptId);
             for (LiterContent content1 : creations){
                 arr.add(content1.getNo());
             }
-            data.put("creations",CaculateUtils.deleteListPrefix(creations));
+            data.put("creation",CaculateUtils.deleteListPrefix(creations));
         }
 
-        data.put("charpt",CaculateUtils.deletePrefix(charpt));
+        data.put("chapter",CaculateUtils.deletePrefix(charpt));
 
         return AjaxResult.success(data);
 
@@ -75,13 +73,29 @@ public class LiterCreatioController {
      *@Data:16:43 2020/1/30
      **/
     @GetMapping("/readNewLiterPro")
-    public Object ReadNewLiterPro(Long charptId, String date){
-        Map<String,Object> data = new HashMap<>();
-        String userId = ShiroUtils.getUserId();
-        List<LiterContent> contents = literContentService.GetContentsOrderByDate(userId,charptId, DateUtils.parseDate(date),new ArrayList<>());
-        data.put("contents",CaculateUtils.deleteListPrefix(contents));
+    public Object ReadNewLiterPro(Long charptId, String date,Integer start,Integer limit){
+        ResultSet<LiterContent> resultSet = literContentService.GetContentsOrderByDate
+                (charptId,DateUtils.parseDate(date),start,limit,new LinkedList<>());
+        resultSet.setList(CaculateUtils.deleteListPrefix(resultSet.getList()));
+        return AjaxResult.success(resultSet);
 
-        return AjaxResult.success(data);
+    }
+
+    /**
+     *@Author:THINKPAD
+     *@Description:推荐文学创作列表
+     * @param charptId
+     * @param date
+     * @param start
+     * @param limit
+     *@Return:java.lang.Object
+     *@Data:16:43 2020/1/30
+     **/
+    @GetMapping("/readRecomLiterPro")
+    public Object ReadRecomLiterPro(Long charptId,Integer start,Integer limit){
+        ResultSet<LiterContent> resultSet = literContentService.GetContentsOrderByFavors(charptId,100,start,limit);
+        resultSet.setList(CaculateUtils.deleteListPrefix(resultSet.getList()));
+        return AjaxResult.success(resultSet);
 
     }
     /**
@@ -107,10 +121,11 @@ public class LiterCreatioController {
      *@Data:17:19 2020/1/30
      **/
     @GetMapping("/readNextLiteraturePro")
-    public Object ReadNextLiteraturePro(Long charptId,String date){
-       List<LiterContent> contents = literContentService.GetContentsOrderByDate
-                (ShiroUtils.getUserId(),charptId,DateUtils.parseDate(date),new LinkedList<String>());
-        return AjaxResult.success(CaculateUtils.deleteListPrefix(contents));
+    public Object ReadNextLiteraturePro(Long charptId,String date,int start,int limit){
+       ResultSet<LiterContent> resultSet = literContentService.GetContentsOrderByDate
+                (charptId,DateUtils.parseDate(date),start,limit,new LinkedList<>());
+       resultSet.setList(CaculateUtils.deleteListPrefix(resultSet.getList()));
+        return AjaxResult.success(resultSet);
 
     }
 
@@ -126,13 +141,13 @@ public class LiterCreatioController {
      *@Data:23:38 2020/1/30
      **/
     @PostMapping("/createLiterContent")
-    public Object CreateLiterContent(String content,Long charpId,String bookName,String charpName,String secName){
+    public Object CreateLiterContent(String content,Long charpId,String title,String charpName,String secName){
         LiterContent data = new LiterContent();
         data.setNo(ProjectConstant.CLITERPREFIX+ SnowflakeIdWorker.getUUID());
         data.setContent(content);
         data.setSummary(CaculateUtils.subStr(content,400));
         data.setCharpId(charpId);
-        data.setBookName(bookName);
+        data.setTitle(title);
         data.setCharpName(charpName);
         data.setSecName(secName);
         literContentService.SaveLiterContent(data);

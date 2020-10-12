@@ -11,6 +11,15 @@ import java.util.List;
 
 public interface LiterContentMapper extends BaseMapper<LiterContent>{
 
+
+
+    //获取用户在该文学创作
+    @Select("SELECT found_rows() " +
+            "FROM t_pro_content " +
+            "WHERE book_id = #{content_id} " +
+            "AND is_del = 0 " )
+    int selectConentCountByBookId(String content_id);
+
     @Select("SELECT c.no,c.content,c.detail,c.file,c.charp_id,c.likes,c.recom_no,c.view,c.adopt,c.create_by,u.nickname,u.avatar " +
             "FROM t_pro_content as c LEFT JOIN t_sys_user as u " +
             "ON c.charp_id = #{charpId} AND c.id_del = 0 " +
@@ -73,12 +82,7 @@ public interface LiterContentMapper extends BaseMapper<LiterContent>{
             "WHERE charp_id = #{id} " +
             "AND adopt = 1 " +
             "AND is_del = 0 " +
-            "LIMIT 1" +
-            "UNION" +
-            "SELECT count(no) as creators " +
-            "FROM t_pro_content " +
-            "WHERE charp_id = #{id} " +
-            "AND is_del = 0 ")
+            "LIMIT 1 " )
     @Results(value = {
             @Result(column = "no",property = "no"),
             @Result(column = "title",property = "title"),
@@ -99,7 +103,7 @@ public interface LiterContentMapper extends BaseMapper<LiterContent>{
     })
     LiterContent selectAdoptConent(Long id);
 
-    @Select("SELECT no,title,summary,content,book_name,charp_name,sec_name,likes,recom_no,adopt,create_by,create_dat " +
+    @Select("SELECT no,title,content,charp_name,sec_name,likes,instr(favorer,#{userid}) as is_like,recom_no,adopt,create_by as id,create_dat " +
             "FROM t_pro_content " +
             "WHERE no = #{no} " +
             "AND is_del = 0 " )
@@ -114,15 +118,18 @@ public interface LiterContentMapper extends BaseMapper<LiterContent>{
             @Result(column = "charp_name",property = "charpName"),
             @Result(column = "sec_name",property = "secName"),
             @Result(column = "likes",property = "likes"),
+            @Result(column = "is_like",property = "islike"),
             @Result(column = "recom_no",property = "recomNo"),
             @Result(column = "view",property = "view"),
             @Result(column = "adopt",property = "adopt"),
             @Result(column = "create_by",property = "createBy"),
             @Result(column = "create_dat",property = "createDat"),
+            @Result(column = "{id=id}",property = "userInfo",one = @One(select="com.myIsoland.mapper.system.TsysUserMapper.queryUserInfoById",
+                    fetchType = FetchType.EAGER)),
             @Result(column = "no",property = "recommends",many = @Many(select="com.myIsoland.mapper.product.RecommendMapper.selectHotRecommend",
                     fetchType = FetchType.EAGER))
     })
-    LiterContent selectLiterContentRecom(String no);
+    LiterContent selectLiterContentRecom(@Param("userid") String userId,@Param("no") String no);
 
     /**
      *@Author:THINKPAD
@@ -181,9 +188,28 @@ public interface LiterContentMapper extends BaseMapper<LiterContent>{
     List<LiterContent> selectUserLiterContentByDate(@Param("userId") String userId,@Param("date") Date date,@Param("page") int page);
 
     @Update("UPDATE t_pro_content " +
-            "SET likes = likes + 1,favorer = CONCAT(favorer,#{userId}) " +
+            "SET likes = likes + 1,favorer = CONCAT(favorer,#{userId}),l_update_dat = now() " +
             "WHERE no = #{no} " +
             "AND is_del = 0 ")
     int updateLikeSts(@Param("userId") String userId,@Param("no") String no);
+
+
+    @Update("UPDATE t_pro_content " +
+            "SET likes = likes - 1,favorer = replace(favorer,#{userId},''),l_update_dat = now() " +
+            "WHERE no = #{no} " +
+            "AND is_del = 0 ")
+    int delLikeSts(@Param("userId") String userId,@Param("no")String no);
+
+
+    @Insert("<script>"+
+            "insert into t_pro_content (no,likes,favorer,l_update_dat) " +
+            "values " +
+            "<foreach collection='data' item='param1' separator=','>" +
+            " (#{param1.no},#{param1.likes},#{param1.favorer},now()) " +
+            " </foreach> " +
+            "on duplicate key " +
+            "update likes=likes+values(likes),favorer = CONCAT(favorer,values(favorer)),l_update_dat=now(); " +
+            "</script>")
+    int batchUpdateLikeSts(@Param("data") List<LiterContent> data);
 
 }

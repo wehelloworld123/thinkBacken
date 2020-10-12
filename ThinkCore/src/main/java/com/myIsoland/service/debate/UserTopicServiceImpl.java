@@ -22,18 +22,18 @@ public class UserTopicServiceImpl extends ServiceImpl<UserTopicMapper,UserTopic>
     }
 
     @Override
-    public List<Topic> GetUserAnsTopic(Date date) {
-        return deleteTopicsPrefix(this.baseMapper.GetUserTopics(ShiroUtils.getUserId(),date));
+    public List<Topic> GetUserAnsTopic(Date date,int startIndex,int pageSize) {
+        return deleteTopicsPrefix(this.baseMapper.GetUserTopics(ShiroUtils.getUserId(),date,startIndex,pageSize));
     }
 
     @Override
-    public List<UserTopic> GetUserRefBook() {
+    public List<UserTopic> GetUserRefBook(int startIndex,int pageSize) {
         LambdaQueryWrapper<UserTopic> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserTopic::getCreateBy,ShiroUtils.getUserId())
                 .eq(UserTopic::getIsDel,0)
                 .eq(UserTopic::getStatus,1)
                 .orderByDesc(UserTopic::getCreateBy)
-                .last("limit 5")
+                .last("limit "+startIndex+","+pageSize)
                 .select(UserTopic::getReferBook,UserTopic::getReferType);
         return this.baseMapper.selectList(wrapper);
     }

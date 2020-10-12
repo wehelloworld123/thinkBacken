@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PoemSetMapper extends BaseMapper<PoemSet> {
     /**
@@ -15,7 +16,7 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
      *@Return:com.myIsoland.enitity.product.LiterCharpt
      *@Data:21:46 2020/1/28
      **/
-    @Select("SELECT id,charpter,describe,creators,number,root_ord,ord,poetry_id,liter_id,paint_id,is_lock,finish,create_dat " +
+    @Select("SELECT id,charpter,description,creators,number,root_ord,ord,poetry_id,liter_id,paint_id,is_lock,finish,create_dat " +
             "FROM t_pro_poemset " +
             "WHERE poetry_id = #{uid} " +
             "AND is_lock = 0 " +
@@ -28,14 +29,14 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
     @Results({
             @Result(column = "id",property = "id"),
             @Result(column = "charpter",property = "charpter"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "creators",property = "creators"),
             @Result(column = "number",property = "number"),
             @Result(column = "poetry_id",property = "poetryId"),
             @Result(column = "liter_id",property = "literId"),
             @Result(column = "paint_id",property = "paintId"),
             @Result(column = "root_ord",property = "rootOrder"),
-            @Result(column = "ord",property = "order"),
+            @Result(column = "ord",property = "ord"),
             @Result(column = "is_lock",property = "isLock"),
             @Result(column = "finish",property = "finish"),
             @Result(column = "create_dat",property = "createDat"),
@@ -50,16 +51,16 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
      *@Return:java.util.List<com.myIsoland.enitity.product.PaintingPart>
      *@Data:16:00 2020/1/31
      **/
-    @Select("SELECTid,charpter,describe,number,root,poetry_id,liter_id,paint_id,root_ord,ord,is_lock,finish,create_dat " +
+    @Select("SELECT id,charpter,description,number,root,poetry_id,liter_id,paint_id,root_ord,ord,is_lock,finish,create_dat " +
             "FROM t_pro_poemset " +
             "WHERE poetry_id = #{poetryId} " +
             "AND root = 1 " +
             "AND is_del = 0 " +
-            "ORDER BY order DESC")
+            "ORDER BY ord DESC")
     @Results({
             @Result(column = "id",property = "id"),
             @Result(column = "charpter",property = "charpter"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "requirement",property = "requirement"),
             @Result(column = "creators",property = "creators"),
             @Result(column = "number",property = "number"),
@@ -67,7 +68,7 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
             @Result(column = "liter_id",property = "literId"),
             @Result(column = "paint_id",property = "paintId"),
             @Result(column = "root_ord",property = "rootOrder"),
-            @Result(column = "ord",property = "order"),
+            @Result(column = "ord",property = "ord"),
             @Result(column = "is_lock",property = "isLock"),
             @Result(column = "finish",property = "finish"),
             @Result(column = "create_dat",property = "createDat"),
@@ -76,22 +77,24 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
     })
     List<PoemSet> selectPoemSets(String poetryId);
 
+
     /**
      *@Author:THINKPAD
-     *@Description:根据诗词章节id获取子章节信息
+     *@Description:根据章节id获取诗歌以及章节信息
      * @param id
-     *@Return:java.util.List<com.myIsoland.enitity.product.PoemSet>
-     *@Data:15:59 2020/1/31
+     *@Return:java.util.List<com.myIsoland.enitity.product.PaintingPart>
+     *@Data:16:00 2020/1/31
      **/
-    @Select("SELECT id,charpter,describe,number,root,poetry_id,liter_id,paint_id,root_ord,ord,is_lock,finish,create_dat " +
-            "FROM t_pro_poemset " +
-            "WHERE root_id = #{id} " +
-            "AND is_del = 0 " +
-            "ORDER BY order ASC")
+    @Select("SELECT uid,seter,name,topic,purpose,description,liter_id,paint_id,root_ord,ord,is_lock,finish,create_dat " +
+            "FROM t_pro_poemset as A left join t_pro_poetry as B " +
+            "ON A.poetry_id = B.uid " +
+            "AND B.is_del = 0 " +
+            "WHERE A.id = #{id} " +
+            "AND A.is_del = 0 ")
     @Results({
             @Result(column = "id",property = "id"),
             @Result(column = "charpter",property = "charpter"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "requirement",property = "requirement"),
             @Result(column = "creators",property = "creators"),
             @Result(column = "number",property = "number"),
@@ -99,7 +102,39 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
             @Result(column = "liter_id",property = "literId"),
             @Result(column = "paint_id",property = "paintId"),
             @Result(column = "root_ord",property = "rootOrder"),
-            @Result(column = "ord",property = "order"),
+            @Result(column = "ord",property = "ord"),
+            @Result(column = "is_lock",property = "isLock"),
+            @Result(column = "finish",property = "finish"),
+            @Result(column = "create_dat",property = "createDat"),
+            @Result(property = "id",column = "id",many = @Many(select="com.myIsoland.mapper.product.PoemSetMapper.selectChirdSets",
+                    fetchType = FetchType.EAGER))
+    })
+    Map<String,Object> selectPoetryBySetId(Long id);
+
+    /**
+     *@Author:THINKPAD
+     *@Description:根据诗词章节id获取子章节信息
+     * @param id
+     *@Return:java.util.List<com.myIsoland.enitity.product.PoemSet>
+     *@Data:15:59 2020/1/31
+     **/
+    @Select("SELECT id,charpter,description,number,root,poetry_id,liter_id,paint_id,root_ord,ord,is_lock,finish,create_dat " +
+            "FROM t_pro_poemset " +
+            "WHERE root_id = #{id} " +
+            "AND is_del = 0 " +
+            "ORDER BY ord ASC")
+    @Results({
+            @Result(column = "id",property = "id"),
+            @Result(column = "charpter",property = "charpter"),
+            @Result(column = "description",property = "description"),
+            @Result(column = "requirement",property = "requirement"),
+            @Result(column = "creators",property = "creators"),
+            @Result(column = "number",property = "number"),
+            @Result(column = "poetry_id",property = "poetryId"),
+            @Result(column = "liter_id",property = "literId"),
+            @Result(column = "paint_id",property = "paintId"),
+            @Result(column = "root_ord",property = "rootOrder"),
+            @Result(column = "ord",property = "ord"),
             @Result(column = "is_lock",property = "isLock"),
             @Result(column = "finish",property = "finish"),
             @Result(column = "create_dat",property = "createDat")
@@ -115,7 +150,7 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
      *@Return:com.myIsoland.enitity.product.LiterCharpt
      *@Data:21:46 2020/1/28
      **/
-    @Select("SELECT id,charpter,describe,requirement,number,root,poetry_id,liter_id,paint_id,root_ord,ord,is_lock,finish,create_dat " +
+    @Select("SELECT id,charpter,description,requirement,pic,number,root,poetry_id,liter_id,paint_id,ord,is_lock,finish,create_dat " +
             "FROM t_pro_poemset " +
             "WHERE id = #{id} " +
             "AND root = 0 " +
@@ -123,19 +158,48 @@ public interface PoemSetMapper extends BaseMapper<PoemSet> {
     @Results({
             @Result(column = "id",property = "id"),
             @Result(column = "charpter",property = "charpter"),
-            @Result(column = "describe",property = "describe"),
+            @Result(column = "description",property = "description"),
             @Result(column = "requirement",property = "requirement"),
             @Result(column = "number",property = "number"),
             @Result(column = "poetry_id",property = "poetryId"),
             @Result(column = "liter_id",property = "literId"),
             @Result(column = "paint_id",property = "paintId"),
-            @Result(column = "root_ord",property = "rootOrder"),
-            @Result(column = "ord",property = "order"),
+            @Result(column = "pic",property = "pic"),
+            @Result(column = "ord",property = "ord"),
             @Result(column = "is_lock",property = "isLock"),
             @Result(column = "finish",property = "finish"),
             @Result(column = "create_dat",property = "createDat"),
-            @Result(property = "literContent",column = "id",one = @One(select="com.myIsoland.mapper.product.LiterContentMapper.selectAdoptConent",
+            @Result(property = "poemContent",column = "id",one = @One(select="com.myIsoland.mapper.product.PoemContentMapper.selectAdoptConent",
                     fetchType = FetchType.EAGER))
     })
     PoemSet selectChaptById(long id);
+
+
+
+    @Select("SELECT A.id,A.charpter,A.description,A.pic,A.poetry_id,A.creators,A.create_dat,B.name,B.views " +
+            "FROM t_pro_poemset as A INNER JOIN t_pro_poetry as B " +
+            "ON A.is_lock = 0 " +
+            "AND A.finish = 0" +
+            "AND A.is_del = 0" +
+            "AND B.uid = A.poetry_id " +
+            "AND B.is_del = 0" +
+            "ORDER BY A.creators DESC " )
+    @Results(id = "poetryMap",value = {
+            @Result(column = "id",property = "id"),
+            @Result(column = "charpter",property = "charpter"),
+            @Result(column = "description",property = "description"),
+            @Result(column = "pic",property = "pic"),
+            @Result(column = "creators",property = "creators"),
+            @Result(column = "create_dat",property = "createDat"),
+            @Result(column = "poetry_id",property = "poetryId"),
+            @Result(column = "name",property = "poetryName"),
+            @Result(column = "views",property = "views")
+    })
+    /**
+     *@Author:THINKPAD
+     *@Description:根据热门获取小集列表
+     *@Return:java.util.List<com.myIsoland.enitity.product.PoemSet>
+     *@Data:22:38 2020/6/8
+     **/
+    List<PoemSet> selectPoemSetByHotNo();
 }

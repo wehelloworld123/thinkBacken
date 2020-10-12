@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import sun.plugin2.message.Serializer;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.enums.SexType;
+import com.myIsoland.model.ImageInfo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,6 +21,22 @@ public class Disscuss extends BaseEntity implements Serializable{
     private  Long id;
 
     private String content;
+
+    private String pic1;
+
+    private String pic2;
+
+    private String pic3;
+
+    private String pic4;
+
+    private String pic5;
+
+    private String pic6;
+
+    private String pic7;
+
+    private String pic8;
 
     private String pic;
 
@@ -54,10 +71,13 @@ public class Disscuss extends BaseEntity implements Serializable{
     private String favorer;
     @TableField(exist = false)
     Comment comment;
+    @TableField(exist = false)
+    private List<ImageInfo> imgs;
 
     public Disscuss() {
         super();
     }
+
     public Disscuss(Long id, int likes, String favorer) {
         this.id = id;
         this.likes = likes;

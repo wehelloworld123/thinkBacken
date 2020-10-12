@@ -22,7 +22,7 @@ public class MetaHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         Date date = DateUtils.getNowDate();
-        this.setFieldValByName("createBy", ShiroUtils.getUserId(), metaObject);
+        this.setFieldValByName("createBy", /*ShiroUtils.getUserId()*/"488294747442511879", metaObject);
         this.setFieldValByName("createDat",date, metaObject);
         this.setFieldValByName("lUpdateDat", date, metaObject);
     }

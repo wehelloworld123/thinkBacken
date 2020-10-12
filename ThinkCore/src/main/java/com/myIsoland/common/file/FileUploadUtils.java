@@ -26,7 +26,7 @@ public class FileUploadUtils
     /**
      * 默认上传的地址
      */
-    private static String defaultBaseDir = V2Config.getProfile();
+    private static String defaultBaseDir = V2Config.getDefaultBaseDir();
     
     /**
      * 是否上传到static

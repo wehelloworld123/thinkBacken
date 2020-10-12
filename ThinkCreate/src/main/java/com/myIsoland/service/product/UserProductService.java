@@ -5,13 +5,14 @@ import com.myIsoland.enitity.product.UserProduct;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface UserProductService extends IService<UserProduct> {
     int DelUserProduct(String userId,Long id);
 
-    List<UserProduct> GetUserLiteratures(String userId,int kind, Date date, int page);
+    List<Map<String,Object>> GetUserLiteratures(String userId, int kind, int type, Date date, int start, int limit);
 
-    List<UserProduct> GetUserPaintings(String userId,int kind, Date date, int page);
+    List<Map<String,Object>> GetUserPaintings(String userId, int kind, int type, Date date, int start, int limit);
 
-    List<UserProduct> GetUserPoemsint(String userId,int kind, Date date, int page);
+    List<Map<String,Object>> GetUserPoemsint(String userId, int kind, int type, Date date, int start, int limit);
 }

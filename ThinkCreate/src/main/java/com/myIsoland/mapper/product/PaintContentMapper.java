@@ -10,6 +10,12 @@ import org.apache.ibatis.mapping.FetchType;
 import java.util.List;
 
 public interface PaintContentMapper extends BaseMapper<PaintContent> {
+    //获取用户在该绘画创作
+    @Select("SELECT found_rows() " +
+            "FROM t_pro_paint_content " +
+            "WHERE paint_id = #{content_id} " +
+            "AND is_del = 0 " )
+    int selectConentCountByPaintId(String content_id);
 
     @Select("SELECT c.id,c.title,c.photo,c.cover,c.part_id,c.likes,c.recom_no,c.adopt,c.create_by,u.nickname,u.avatar " +
             "FROM t_pro_paint_content as c LEFT JOIN t_sys_user as u " +
@@ -52,13 +58,14 @@ public interface PaintContentMapper extends BaseMapper<PaintContent> {
     })
     PaintContent selectPaintContentById(String no);
 
-    @Select("SELECT no,title,image,paint_id,paint_name,likes，recom_no,part_name,sec_name,adopt,create_by,create_dat " +
+    @Select("SELECT no,title,content,image,paint_id,paint_name,likes，recom_no,part_name,sec_name,adopt,create_by,create_dat,instr(favorer,#{userId}) as is_like " +
             "FROM t_pro_paint_content " +
             "WHERE no = #{no} " +
             "AND is_del = 0 " )
     @Results(value = {
             @Result(column = "no",property = "no"),
             @Result(column = "title",property = "title"),
+            @Result(column = "content",property = "content"),
             @Result(column = "image",property = "image"),
             @Result(column = "part_id",property = "partId"),
             @Result(column = "paint_id",property = "paintId"),
@@ -67,10 +74,13 @@ public interface PaintContentMapper extends BaseMapper<PaintContent> {
             @Result(column = "part_name",property = "partName"),
             @Result(column = "recom_no",property = "recomNo"),
             @Result(column = "likes",property = "likes"),
+            @Result(column = "is_like",property = "islike"),
             @Result(column = "adopt",property = "adopt"),
             @Result(column = "create_by",property = "createBy"),
             @Result(column = "create_dat",property = "createDat"),
-            @Result(column = "no",property = "recommends",many = @Many(select="com.myIsoland.mapper.product.RecommendMapper.selectHotRecommend",
+            @Result(column = "no",property = "map",many = @Many(select="com.myIsoland.mapper.product.RecommendMapper.selectRecomCount",
+                    fetchType = FetchType.EAGER)),
+            @Result(column = "{id=create_by}",property = "userInfo",one = @One(select="com.myIsoland.mapper.system.TsysUserMapper.queryUserInfoById",
                     fetchType = FetchType.EAGER))
     })
     PaintContent selectPaintContentRecom(String no);
@@ -112,8 +122,15 @@ public interface PaintContentMapper extends BaseMapper<PaintContent> {
 
 
     @Update("UPDATE t_pro_paint_content " +
-            "SET likes = likes + 1,favorer = CONCAT(favorer,#{userId}) " +
+            "SET likes = likes + 1,favorer = CONCAT(favorer,#{userId}),l_update_dat = now()  " +
             "WHERE no = #{no} " +
             "AND is_del = 0 ")
-    int updateLikeSts(@Param("userId") String userId, @Param("no") String no);
+    int updateLikeSts(@Param("userId") String userId,@Param("no") String no);
+
+
+    @Update("UPDATE t_pro_paint_content " +
+            "SET likes = likes - 1,favorer = replace(favorer,#{userId},''),l_update_dat = now() " +
+            "WHERE no = #{no} " +
+            "AND is_del = 0 ")
+    int delLikeSts(@Param("userId") String userId,@Param("no")String no);
 }

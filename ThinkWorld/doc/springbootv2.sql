@@ -325,7 +325,7 @@ INSERT INTO `t_sys_quartz_job_log` VALUES ('333610572270669824', 'v2Task2', 'SYS
 DROP TABLE IF EXISTS `t_thi_theory`;
 CREATE TABLE `t_thi_theory` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增列',
-  `no` varchar(20) NOT NULL COMMENT '编号',
+  `num` varchar(20) NOT NULL COMMENT '编号',
   `title` varchar(20) NOT NULL COMMENT '标题',
   `describe` varchar(50) NOT NULL COMMENT '描述',
   `cover` varchar(50) DEFAULT NULL COMMENT '封面背景',
@@ -341,7 +341,8 @@ CREATE TABLE `t_thi_theory` (
 DROP TABLE IF EXISTS `t_thi_quot`;
 CREATE TABLE `t_thi_quot` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增列',
-  `no` varchar(20) NOT NULL COMMENT '编号',
+  `num` varchar(20) NOT NULL COMMENT '编号',
+  `question` varchar(70) NOT NULL COMMENT '问题',
   `content` varchar(70) NOT NULL COMMENT '语论',
   `explation` varchar(200) NOT NULL COMMENT '解释',
   `theory_no` varchar(20) DEFAULT NULL COMMENT '理论编号',

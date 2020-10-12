@@ -2,6 +2,8 @@ package com.myIsoland.service.community;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myIsoland.enitity.community.Disscuss;
+import com.myIsoland.model.ResultSet;
+
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +13,7 @@ public interface DisscussService extends IService<Disscuss> {
     List<Disscuss> GetHotDisscussByLike(String userId,int likes, Date update, int number);
 
 
-    List<Disscuss> GetNewDateDisscuss(String userId,Date date, int start,int number);
+    ResultSet<Disscuss> GetNewDateDisscuss(String userId, Date date, int start, int number);
 
 
     List<Disscuss> GetConcernDis(String userId,Date date,int start,int number);

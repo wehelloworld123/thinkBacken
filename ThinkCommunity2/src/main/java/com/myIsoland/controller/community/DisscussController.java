@@ -12,6 +12,7 @@ import com.myIsoland.enitity.system.TSysRoleUser;
 import com.myIsoland.enitity.system.TsysUser;
 import com.myIsoland.enums.CodeEnum;
 import com.myIsoland.enums.SexType;
+import com.myIsoland.model.ResultSet;
 import com.myIsoland.service.community.CommentService;
 import com.myIsoland.service.community.DisscussService;
 import com.myIsoland.shiro.util.ShiroUtils;
@@ -57,8 +58,12 @@ public class DisscussController {
      *@Data:23:17 2019/11/23
      **/
     @GetMapping("/readNewDiscuss")
-    public Object ReadNewDiscuss(String date,int page){
-        List<Disscuss> result = disscussService.GetNewDateDisscuss(ShiroUtils.getUserId(),DateUtils.parseDate(date),page*14,14);
+    public Object ReadNewDiscuss(String date,Integer startIndex,Integer pageSize,boolean isLogin){
+        String userId = null;
+        if(isLogin){
+            userId = ShiroUtils.getUserId();
+        }
+        ResultSet<Disscuss> result = disscussService.GetNewDateDisscuss(userId,DateUtils.parseDate(date),startIndex,pageSize);
         return AjaxResult.success(result);
     }
 

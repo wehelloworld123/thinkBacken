@@ -1,5 +1,6 @@
 package com.myIsoland.controller.creation;
 
+import com.myIsoland.common.component.RedisCacheService;
 import com.myIsoland.common.component.SingleParamException;
 import com.myIsoland.common.domain.AjaxResult;
 import com.myIsoland.common.util.CaculateUtils;
@@ -7,6 +8,7 @@ import com.myIsoland.common.util.DateUtils;
 import com.myIsoland.constant.ProjectConstant;
 import com.myIsoland.constant.THINKConstant;
 import com.myIsoland.enitity.product.Recommend;
+import com.myIsoland.enitity.system.TsysUser;
 import com.myIsoland.enums.CodeEnum;
 import com.myIsoland.enums.CreateKind;
 import com.myIsoland.enums.RecomType;
@@ -36,6 +38,8 @@ public class CreationDetailController {
     private PoemContentService poemContentService;
     @Autowired
     private RecommendService recommendService;
+    @Autowired
+    private RedisCacheService redisCacheService;
 
 
     /**
@@ -46,62 +50,50 @@ public class CreationDetailController {
      *@Data:21:10 2020/1/30
      **/
     @GetMapping("/readCreationDetail")
-    public Object readCreationDetail(String no,int type) throws SingleParamException {
-        if(RecomType.LITERATURE.equals(type)){
+    public Object readCreationDetail(String no,int type,Boolean isLogin) throws SingleParamException {
+        String userId = null;
+        if(isLogin){
+            userId = ShiroUtils.getUserId();
+        }
+        if(RecomType.LITERATURE.getValue()==type){
             no = ProjectConstant.CLITERPREFIX + no;
-            return AjaxResult.success(CaculateUtils.deletePrefix(literContentService.GetLiterContentDetail(no)));
-        }else if(RecomType.PAINTING.equals(type)){
+            return AjaxResult.success(CaculateUtils.deletePrefix(literContentService.GetLiterContentDetail(userId,no)));
+        }else if(RecomType.PAINTING.getValue()==type){
             no = ProjectConstant.CPAINTINGPREFIX + no;
-            return AjaxResult.success(paintContentService.GetPaintContentById(no));
-        }else if(RecomType.POEMTY.equals(type)){
+            return AjaxResult.success(paintContentService.GetPaintContentById(no,null));
+        }else if(RecomType.POEMTY.getValue()==type){
             no = ProjectConstant.CPOETRYPREFIX + no;
-            return AjaxResult.success(poemContentService.GetPoemContentById(no));
+            return AjaxResult.success(poemContentService.GetPoemContentById(no,userId));
         }else
             throw new  SingleParamException("类型查找错误");
     }
 
-
     /**
      *@Author:THINKPAD
-     *@Description:创建用户评论
-     * @param content
-     * @param proId
-     * @param type
+     *@Description:用户点赞创作内容
+     * @param no,type
      *@Return:java.lang.Object
-     *@Data:23:51 2020/1/30
+     *@Data:21:10 2020/1/30
      **/
-    @PostMapping("/createRecommend")
-    public Object CreateRecommend(String content,String proId,int kind){
-        Recommend data = new Recommend();
-        data.setConent(content);
-        data.setContenId(proId);
-        data.setKind(kind);
-        data.setCreator(ShiroUtils.getUser().getUsername());
-        data.setCreateAvat(ShiroUtils.getUser().getAvatar());
-        recommendService.SaveRecomment(data);
-        return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
-    }
-    /**
-     *@Author:THINKPAD
-     *@Description:读取评论
-     * @param no
-     * @param date
-     * @param type
-     * @param start
-     *@Return:java.lang.Object
-     *@Data:0:02 2020/1/31
-     **/
-    @GetMapping("/readRecommends")
-    public Object ReadRecommends(String no,String date,int type,int start){
+    @PostMapping("/modifyLikes")
+    public Object ModifyLikes(String no,int type){
+        String userId = ShiroUtils.getUserId();
         no = ProjectConstant.CLITERPREFIX + no;
-        List<Recommend> data = recommendService.GetRecommentByDate
-                (no, DateUtils.parseDate(date),RecomType.valueOf(type),start);
-        return AjaxResult.success(data);
-    }
 
-    @PostMapping("/modifyRecomLike")
-    public Object ModifyRecomLike(Long id){
-        recommendService.UpdateLikeSts(ShiroUtils.getUserId(),id);
+        if (type==1){
+                redisCacheService.setHashValue("c_like_lit_"+no,userId,"1");
+                System.out.println(redisCacheService.getHashMap("c_like_lit_"+no));
+        }else if(type==0){
+            Boolean b = redisCacheService.hashFieldExist("c_like_lit_"+no,userId);
+            if(b){
+                if(redisCacheService.delHashField("c_like_lit_"+no,userId).equals(0)){
+                    return AjaxResult.error(CodeEnum.REDIS_EXCEPTION.getCode(),CodeEnum.REDIS_EXCEPTION.getMessage(),null);
+                }
+            }else {
+                literContentService.DelLikeSts(userId,no);
+            }
+        }
         return AjaxResult.success(CodeEnum.SQL_SUCCESS.getMessage());
     }
+
 }

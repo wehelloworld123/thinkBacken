@@ -20,6 +20,8 @@ public class V2Config
     private String copyrightYear;
     /** 上传路径 */
     private static String profile;
+    /** 上传路径 */
+    private static String defaultBaseDir;
     /** 是否开启 上传static **/
     private static String isstatic;
     /** 开启存放静态文件夹后目录 **/
@@ -119,5 +121,12 @@ public class V2Config
 	public static void setEmail_password(String email_password) {
 		V2Config.email_password = email_password;
 	}
-	
+
+    public static String getDefaultBaseDir() {
+        return defaultBaseDir;
+    }
+
+    public static void setDefaultBaseDir(String defaultBaseDir) {
+        V2Config.defaultBaseDir = defaultBaseDir;
+    }
 }

@@ -29,7 +29,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static Object error()
     {
-        return error(1, "操作失败");
+        return error(1, "操作失败",null);
     }
 
     /**
@@ -40,7 +40,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static Object error(String msg)
     {
-        return error(500, msg);
+        return error(500, msg,null);
     }
 
     /**
@@ -50,11 +50,12 @@ public class AjaxResult extends HashMap<String, Object>
      * @param msg 内容
      * @return 错误消息
      */
-    public static Object error(int code, Object msg)
+    public static Object error(int code,String msg, Object errMsg)
     {
         AjaxResult json = new AjaxResult();
         json.put("code", code);
         json.put("msg", msg);
+        json.put("err", errMsg);
         return JSONObject.toJSON(json);
     }
 

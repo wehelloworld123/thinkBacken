@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class UserProductServiceImpl extends ServiceImpl<UserProductMapper,UserProduct> implements UserProductService {
     @Override
@@ -20,17 +22,17 @@ public class UserProductServiceImpl extends ServiceImpl<UserProductMapper,UserPr
     }
 
     @Override
-    public List<UserProduct> GetUserLiteratures(String userId,int kind, Date date, int page) {
-        return this.baseMapper.selectUserLiterProductByTyp(userId,kind,date,page);
+    public List<Map<String,Object>> GetUserLiteratures(String userId, int kind, int type, Date date, int start, int limit) {
+        return this.baseMapper.selectUserLiterProductByTyp(userId,kind,type,date,start,limit);
     }
 
     @Override
-    public List<UserProduct> GetUserPaintings(String userId,int kind, Date date, int page) {
-        return this.baseMapper.selectUserPaintProductByTyp(userId,kind,date,page);
+    public List<Map<String,Object>> GetUserPaintings(String userId, int kind, int type, Date date, int start, int limit) {
+        return this.baseMapper.selectUserPaintProductByTyp(userId,kind,type,date,start,limit);
     }
 
     @Override
-    public List<UserProduct> GetUserPoemsint(String userId,int kind, Date date, int page) {
-        return this.baseMapper.selectUserPoemProductByTyp(userId,kind,date,page);
+    public List<Map<String,Object>> GetUserPoemsint(String userId, int kind, int type, Date date, int start, int limit) {
+        return this.baseMapper.selectUserPoemProductByTyp(userId,kind,type,date,start,limit);
     }
 }

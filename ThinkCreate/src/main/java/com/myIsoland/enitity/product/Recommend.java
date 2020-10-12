@@ -10,6 +10,8 @@ import com.myIsoland.enums.RecomType;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
+
 @Data
 @TableName("t_pro_recom")
 public class Recommend extends BaseEntity implements Serializable {
@@ -18,33 +20,42 @@ public class Recommend extends BaseEntity implements Serializable {
     private Long id;
 
     @TableField(value = "content")
-    private String conent;
+    private String content;
 
     @TableField(value = "content_id")
-    private String contenId;
-
-    @TableField(value = "kind")
+    private String contentId;
+    @TableField(value = "summary")
+    private String summary;
+    @TableField(value = "title")
+    private String title;
+    @TableField(value = "typ")
     private int kind;
     @TableField(value = "likes")
     private int likes;
-    @TableField(exist = false)
+    @TableField(value = "creator")
     private String creator;
-    @TableField(exist = false)
+    @TableField(value = "create_avat")
     private String createAvat;
+    @TableField(value = "adopt")
+    private int adopt;
     @TableField(exist = false)
     private String total;
     @TableField(value = "favorer")
     @JsonIgnore
     private String favorer;
+    @TableField(exist = false)
+    int islike;
+    @TableField(exist = false)
+    List<Comment> comments;
     public Recommend() {
         super();
     }
 
-    public Recommend(String conent,RecomType kind,int likes, String contenId) {
-        this.conent = conent;
+    public Recommend(String content,RecomType kind,int likes, String contenId) {
+        this.content = content;
         this.kind=kind.getValue();
         this.likes=likes;
-        this.contenId = contenId;
+        this.contentId = contenId;
     }
 }
 

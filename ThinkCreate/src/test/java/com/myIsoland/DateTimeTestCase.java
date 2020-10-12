@@ -18,4 +18,11 @@ public class DateTimeTestCase {
     public void testSend(){
         System.out.println();
     }
+
+    @Test
+    public void test(){
+        Integer start = 0;
+        Integer limit = 10;
+        System.out.println(start*limit);
+    }
 }

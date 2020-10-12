@@ -3,8 +3,13 @@ package com.myIsoland.enums;
 import java.io.Serializable;
 
 public enum CreateKind implements Serializable {
-    HISTORY(1), LITERATURE(2), THINKING(3), GAME(4), ROMANTIC(5), PSYCHOLOGY(6);
-
+    HISTORY(1),
+    LITERATURE(2),
+    THINKING(3),
+    GAME(4),
+    ROMANTIC(5),
+    PSYCHOLOGY(6),
+    INCLUDED(0);//自由创作
     private final int value;
 
     CreateKind(int value) {
@@ -15,6 +20,8 @@ public enum CreateKind implements Serializable {
     }
     public static CreateKind valueOf(int value) {
         switch (value) {
+            case 0:
+                return CreateKind.INCLUDED;
             case 1:
                 return CreateKind.HISTORY;
             case 2:

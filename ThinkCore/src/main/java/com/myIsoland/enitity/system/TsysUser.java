@@ -1,10 +1,7 @@
 package com.myIsoland.enitity.system;
 
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myIsoland.common.base.BaseEntity;
 import com.myIsoland.enums.SexType;
@@ -21,22 +18,24 @@ public class TsysUser implements Serializable {
 
     @TableId(value = "id",type = IdType.INPUT)
     private String id;
-
+    @TableField(value = "username")
     private String username;
-
+    @TableField(value = "email")
     private String email;
-
+    @TableField(value = "password")
     private String password;
-
+    @TableField(value = "nickname")
     private String nickname;
-
+    @TableField(value = "avatar")
     private String avatar;
-
-    private SexType sex;//0代表男，1代表女
-
-    private String describe;
-
-    private Integer isDel;
+    @TableField(value = "sex")
+    private int sex;//0代表男，1代表女
+    @TableField(value = "description")
+    private String description;
+    @TableField(value = "think")
+    private int think;
+    @TableField(value = "is_del")
+    private int isDel;
     @JsonIgnore
     private int type;
 
@@ -47,11 +46,10 @@ public class TsysUser implements Serializable {
         this.password = password;
         this.nickname = nickname;
         this.avatar = avatar;
-        this.sex = sex;
-        this.describe = describe;
+        this.sex = sex.getValue();
+        this.description = describe;
         this.type = type;
     }
-
     public TsysUser() {
         super();
     }

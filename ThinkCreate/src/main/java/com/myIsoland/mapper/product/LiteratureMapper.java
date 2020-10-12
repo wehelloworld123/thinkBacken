@@ -6,7 +6,9 @@ import com.myIsoland.model.LiteratureModel;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface LiteratureMapper extends BaseMapper<Literature> {
     @Select("SELECT uid,name,cover,typ,label,introduce,kind,is_top,create_dat " +
@@ -37,7 +39,7 @@ public interface LiteratureMapper extends BaseMapper<Literature> {
             "AND finish = 0 " +
             "AND is_del = 0 " +
             "ORDER BY create_dat ASC " +
-            "LIMIT 15 ")
+            "LIMIT #{limit} ")
     @Results({
             @Result(column = "uid",property = "uid"),
             @Result(column = "name",property = "name"),
@@ -52,7 +54,7 @@ public interface LiteratureMapper extends BaseMapper<Literature> {
             @Result(column = "create_dat",property = "createDat"),
             @Result(property = "charpt",column = "uid",one = @One(select="com.myIsoland.mapper.product.LiterCharptMapper.selectLiterByUid",fetchType = FetchType.EAGER))
     })
-    List<Literature> selectHotLiters(@Param("kind")int kind,@Param("partner")int partner,@Param("views")int views);
+    List<Literature> selectHotLiters(@Param("kind")int kind,@Param("partner")int partner,@Param("views")int views,@Param("limit")int limit);
 
 
 
@@ -77,4 +79,26 @@ public interface LiteratureMapper extends BaseMapper<Literature> {
             @Result(column = "finish",property = "finish")
     })
     List<Literature> selectLiteratureById(String creationId);
+
+    @Select("SELECT uid,name,cover,label,description,partner,views,1 as proType " +
+            "FROM t_pro_liter " +
+            "WHERE source =#{source}" +
+            "AND create_dat<#{date}" +
+            "AND finish = 1 "+
+            "AND is_del = 0 " +
+            "UNION " +
+            "SELECT uid,name,cover,topic as label,description,partner,views,2 as proType " +
+            "FROM t_pro_paint " +
+            "WHERE source =#{source}" +
+            "AND create_dat<#{date}" +
+            "AND finish = 1 "+
+            "AND is_del = 0 " +
+            "UNION " +
+            "SELECT uid,name,cover,topic as label,description,partner,views,3 as proType " +
+            "FROM t_pro_poetry " +
+            "WHERE source =#{source}" +
+            "AND create_dat<#{date}" +
+            "AND finish = 1 "+
+            "AND is_del = 0 ")
+    List<Map<String,Object>> selectBookListBySubjectSource(@Param("date")Date date, @Param("source") String source);
 }
