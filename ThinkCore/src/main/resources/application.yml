@@ -26,13 +26,14 @@ fuce:
 
 sms:
   #用户名
-  username: smsadmin
+  #username: smsadmin
   #密钥id
-  secretId: AKID3e06wV6kJbfT1IrK7e17HBoJXoqfqYUq
+  #secretId: AKID3e06wV6kJbfT1IrK7e17HBoJXoqfqYUq
   #密钥
-  secretKey: NVNzK7dssb3gs2vXIeU4NccRZQ0M8diP
+  #secretKey: NVNzK7dssb3gs2vXIeU4NccRZQ0M8diP
   #sdkAppId
-  appId: 1400071138
+  #appId: 1400071138
+
   #密钥
   sign: 零度精灵
   templateID: 90980
